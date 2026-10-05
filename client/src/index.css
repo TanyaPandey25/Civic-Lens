@@ -1,0 +1,416 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f5f2;
+    color: #242424;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+/* NAVBAR */
+
+.navbar {
+    height: 72px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-bottom: 1px solid #e8e3dd;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 28px;
+}
+
+.nav-links a {
+    font-size: 14px;
+    color: #555;
+}
+
+.nav-links a:hover {
+    color: #171717;
+}
+
+/* HERO */
+
+.hero {
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    padding: 80px 7%;
+    background: #eee9e2;
+}
+
+.hero-content {
+    max-width: 760px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #777;
+    margin-bottom: 18px;
+}
+
+.hero h1 {
+    font-size: 64px;
+    line-height: 1.05;
+    letter-spacing: -3px;
+    margin-bottom: 25px;
+}
+
+.hero h1 span {
+    font-style: italic;
+}
+
+.hero-text {
+    max-width: 570px;
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 32px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 14px;
+}
+
+/* BUTTONS */
+
+.primary-button,
+.secondary-button {
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    padding: 13px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.primary-button {
+    background: #242424;
+    color: white;
+}
+
+.secondary-button {
+    background: white;
+    color: #242424;
+    border: 1px solid #d9d3cb;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* HOW IT WORKS */
+
+.how-section {
+    padding: 90px 7%;
+}
+
+.section-heading {
+    max-width: 600px;
+    margin-bottom: 45px;
+}
+
+.section-heading h2 {
+    font-size: 40px;
+    letter-spacing: -1.5px;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.step {
+    padding: 28px;
+    background: white;
+    border: 1px solid #e5dfd7;
+    border-radius: 12px;
+}
+
+.step span {
+    font-size: 12px;
+    color: #888;
+}
+
+.step h3 {
+    margin: 15px 0 10px;
+}
+
+.step p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* FORMS */
+
+.form-page {
+    min-height: calc(100vh - 72px);
+    padding: 80px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 620px;
+    background: white;
+    padding: 45px;
+    border: 1px solid #e4ded6;
+    border-radius: 14px;
+}
+
+.form-container h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.form-intro {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d9d3cb;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #555;
+}
+
+.success-message {
+    margin-top: 20px;
+    padding: 12px;
+    background: #eef7ee;
+    border-radius: 8px;
+}
+
+/* ISSUES */
+
+.issues-page {
+    padding: 80px 7%;
+}
+
+.page-heading {
+    max-width: 700px;
+    margin-bottom: 45px;
+}
+
+.page-heading h1 {
+    font-size: 46px;
+    line-height: 1.1;
+    margin-bottom: 15px;
+}
+
+.page-heading > p:last-child {
+    color: #666;
+}
+
+.issues-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.issue-card {
+    background: white;
+    padding: 25px;
+    border: 1px solid #e4ded6;
+    border-radius: 12px;
+}
+
+.issue-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.category {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #777;
+}
+
+.status-badge {
+    font-size: 11px;
+    padding: 5px 8px;
+    background: #eee;
+    border-radius: 20px;
+}
+
+.issue-card h3 {
+    font-size: 21px;
+    margin-bottom: 8px;
+}
+
+.location {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* ISSUE DETAILS */
+
+.details-page {
+    padding: 80px 7%;
+}
+
+.details-container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.details-container h1 {
+    font-size: 50px;
+    line-height: 1.1;
+    margin-bottom: 15px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 45px 0;
+}
+
+.details-grid div {
+    padding: 20px;
+    background: white;
+    border: 1px solid #e4ded6;
+    border-radius: 10px;
+}
+
+.details-grid span,
+.details-grid strong {
+    display: block;
+}
+
+.details-grid span {
+    color: #777;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.issue-description {
+    padding: 30px 0;
+    border-top: 1px solid #ddd;
+    margin-bottom: 25px;
+}
+
+.issue-description h2 {
+    margin-bottom: 12px;
+}
+
+.issue-description p {
+    color: #666;
+}
+
+/* FOOTER */
+
+.footer {
+    padding: 30px 7%;
+    border-top: 1px solid #e4ded6;
+    color: #777;
+    font-size: 13px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .steps,
+    .issues-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 12px;
+    }
+
+    .hero {
+        padding: 60px 20px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    .steps,
+    .issues-grid,
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-container {
+        padding: 28px;
+    }
+}
