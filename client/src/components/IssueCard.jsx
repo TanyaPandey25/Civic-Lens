@@ -1,3 +1,5 @@
+
+import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
 
 function IssueCard({ issue }) {
@@ -20,6 +22,13 @@ function IssueCard({ issue }) {
             <p>
                 Severity: <strong>{issue.severity}</strong>
             </p>
+
+            <Link
+                to={`/issues/${issue.id}`}
+                className="view-details-btn"
+            >
+                View Details →
+            </Link>
         </div>
     );
 }
