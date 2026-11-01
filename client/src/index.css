@@ -325,6 +325,133 @@ svg {
 }
 
 /* =========================================
+   ANIMATED CAMPUS REPORT COUNTER
+========================================= */
+
+.report-counter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  width: fit-content;
+  min-width: 390px;
+  margin-top: 42px;
+  padding: 24px 30px;
+
+  background: rgba(255, 235, 245, 0.035);
+  border: 1px solid rgba(189, 119, 150, 0.25);
+  border-radius: 14px;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  transition:
+    background 300ms ease,
+    border-color 300ms ease,
+    transform 300ms ease;
+}
+
+.report-counter:hover {
+  background: rgba(255, 235, 245, 0.055);
+  border-color: rgba(189, 119, 150, 0.48);
+  transform: translateY(-3px);
+}
+
+.counter-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(189, 119, 150, 0.12);
+  border: 1px solid rgba(189, 119, 150, 0.2);
+  border-radius: 12px;
+}
+
+.counter-icon span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+
+  background: #c58ba5;
+  box-shadow: 0 0 15px rgba(197, 139, 165, 0.55);
+}
+
+.counter-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.counter-label {
+  color: #c58ba5;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 2.5px;
+}
+
+.counter-number {
+  color: #f3e9ed;
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: -2px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-plus {
+  margin-left: 3px;
+  color: #c58ba5;
+  font-size: 25px;
+}
+
+.counter-description {
+  margin: 0;
+  color: #bcaeb6;
+  font-size: 13px;
+}
+
+.counter-live {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #c58ba5;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c58ba5;
+
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(197, 139, 165, 0.4);
+  }
+
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 6px rgba(197, 139, 165, 0);
+  }
+}
+
+/* =========================================
    BUTTONS
 ========================================= */
 
@@ -920,5 +1047,357 @@ hr {
 
   .footer {
     padding: 25px 22px;
+  }
+
+  /* Report counter mobile layout */
+  .report-counter {
+    width: 100%;
+    min-width: 0;
+    padding: 24px 19px;
+  }
+
+  .counter-number {
+    font-size: 40px;
+  }
+
+  .counter-live {
+    top: 12px;
+    right: 12px;
+    font-size: 8px;
+  }
+}
+
+
+/* =========================================
+   THEME TOGGLE BUTTON
+========================================= */
+
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  transform: rotate(12deg);
+}
+
+.theme-icon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+/* =========================================
+   LIGHT THEME
+========================================= */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f3f2;
+  --bg-raised: #fffaf9;
+  --surface: #fffdfc;
+  --surface-hover: #f4e9ed;
+  --surface-soft: #f1e5e9;
+
+  --text: #342630;
+  --text-muted: #796873;
+  --text-subtle: #998791;
+
+  --accent: #a65f7e;
+  --accent-hover: #914b6b;
+  --accent-soft: #f2e2e9;
+  --accent-border: #d8b5c4;
+
+  --border: #e8dce1;
+  --border-soft: #eee4e8;
+
+  --success: #547c60;
+  --warning: #98713e;
+  --danger: #a95767;
+
+  --chocolate: #eadbd5;
+
+  --shadow-soft: 0 12px 35px rgba(75, 43, 58, 0.08);
+}
+
+:root[data-theme="light"] {
+  background: var(--bg);
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(
+      ellipse at 82% 0%,
+      rgba(189, 119, 150, 0.09),
+      transparent 40%
+    ),
+    var(--bg);
+
+  color: var(--text);
+}
+
+/* Navigation */
+
+:root[data-theme="light"] .navbar {
+  background: rgba(255, 250, 249, 0.94);
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="light"] .nav-links a:hover {
+  color: var(--accent);
+}
+
+/* Hero */
+
+:root[data-theme="light"] .hero {
+  background:
+    radial-gradient(
+      ellipse at 88% 22%,
+      rgba(189, 119, 150, 0.18),
+      transparent 42%
+    ),
+    linear-gradient(
+      120deg,
+      #f7edef 0%,
+      #f3e7eb 52%,
+      #f8eeee 100%
+    );
+
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="light"] .hero::after {
+  border-color: rgba(166, 95, 126, 0.17);
+  box-shadow:
+    0 0 0 55px rgba(166, 95, 126, 0.035),
+    0 0 0 110px rgba(166, 95, 126, 0.025);
+}
+
+:root[data-theme="light"] .hero h1 {
+  color: #392934;
+}
+
+:root[data-theme="light"] .hero h1 span {
+  color: #a65f7e;
+}
+
+:root[data-theme="light"] .hero-text {
+  color: #796873;
+}
+
+/* Report counter */
+
+:root[data-theme="light"] .report-counter {
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(166, 95, 126, 0.25);
+  box-shadow: 0 12px 35px rgba(75, 43, 58, 0.045);
+}
+
+:root[data-theme="light"] .report-counter:hover {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(166, 95, 126, 0.45);
+}
+
+:root[data-theme="light"] .counter-number {
+  color: #392934;
+}
+
+:root[data-theme="light"] .counter-description {
+  color: #796873;
+}
+
+/* Buttons */
+
+:root[data-theme="light"] .primary-button {
+  color: #fffafc;
+  background: #9b6079;
+  border-color: #9b6079;
+}
+
+:root[data-theme="light"] .primary-button:hover {
+  background: #844b65;
+  border-color: #844b65;
+}
+
+:root[data-theme="light"] .secondary-button {
+  color: #684557;
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #d8bdc9;
+}
+
+:root[data-theme="light"] .secondary-button:hover {
+  background: #f2e5eb;
+  border-color: #b9879e;
+}
+
+/* How it works */
+
+:root[data-theme="light"] .step {
+  background: linear-gradient(145deg, #fffdfc, #f8f0f2);
+  border-color: var(--border);
+}
+
+:root[data-theme="light"] .step:hover {
+  background: #f5e9ee;
+  border-color: #d7b5c4;
+}
+
+/* Forms */
+
+:root[data-theme="light"] .form-container {
+  background:
+    linear-gradient(145deg, rgba(242, 226, 233, 0.65), transparent 55%),
+    var(--bg-raised);
+
+  border-color: var(--border);
+  box-shadow: 0 24px 75px rgba(75, 43, 58, 0.08);
+}
+
+:root[data-theme="light"] label {
+  color: #594451;
+}
+
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select {
+  color: #342630;
+  background: #fffdfc;
+  border-color: #e0d1d9;
+}
+
+:root[data-theme="light"] input:hover,
+:root[data-theme="light"] textarea:hover,
+:root[data-theme="light"] select:hover {
+  border-color: #bd91a5;
+}
+
+:root[data-theme="light"] input:focus,
+:root[data-theme="light"] textarea:focus,
+:root[data-theme="light"] select:focus {
+  background: #fff;
+  border-color: #a65f7e;
+  box-shadow: 0 0 0 3px rgba(166, 95, 126, 0.12);
+}
+
+:root[data-theme="light"] ::placeholder {
+  color: #a18e98;
+}
+
+:root[data-theme="light"] .success-message {
+  color: #456a50;
+  background: #edf5ee;
+  border-color: #c9dfcd;
+}
+
+/* Issues */
+
+:root[data-theme="light"] .issue-card {
+  background: linear-gradient(150deg, #fffdfc, #f8f0f2);
+  border-color: var(--border);
+}
+
+:root[data-theme="light"] .issue-card:hover {
+  background: linear-gradient(150deg, #f8edf1, #f5e8ed);
+  border-color: #d5b2c1;
+}
+
+:root[data-theme="light"] .category {
+  color: #98617a;
+}
+
+:root[data-theme="light"] .status-badge {
+  color: #765366;
+  background: #f3e8ed;
+  border-color: #e2ccd6;
+}
+
+:root[data-theme="light"] .issue-card strong {
+  color: #594451;
+}
+
+:root[data-theme="light"] .view-details-btn {
+  color: #925a74;
+  border-color: #c8a0b2;
+}
+
+:root[data-theme="light"] .view-details-btn:hover {
+  color: #77425d;
+  border-color: #925a74;
+}
+
+/* Issue details */
+
+:root[data-theme="light"] .details-grid > div {
+  background: #fffdfc;
+  border-color: var(--border);
+}
+
+:root[data-theme="light"] .details-grid > div:hover {
+  background: #f7edf1;
+  border-color: #d8b9c7;
+}
+
+:root[data-theme="light"] .details-grid strong {
+  color: #594451;
+}
+
+/* Footer */
+
+:root[data-theme="light"] .footer {
+  color: #897681;
+  background: #f0e8e9;
+  border-top-color: var(--border);
+}
+
+/* Feedback states */
+
+:root[data-theme="light"] .error-message {
+  color: #984d5c;
+  background: #faeeee;
+  border-color: #e9c9ce;
+}
+
+:root[data-theme="light"] .loading-message,
+:root[data-theme="light"] .empty-message {
+  color: var(--text-muted);
+}
+
+/* Selection */
+
+:root[data-theme="light"] ::selection {
+  color: #fff;
+  background: #a65f7e;
+}
+
+/* Mobile navbar */
+
+@media (max-width: 650px) {
+  .theme-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .theme-icon {
+    font-size: 17px;
   }
 }
