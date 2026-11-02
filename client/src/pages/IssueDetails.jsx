@@ -2,6 +2,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import {
+    ArrowLeft,
+    MapPin,
+    CalendarDays,
+    Trash2,
+    RefreshCw,
+    Image as ImageIcon
+} from "lucide-react";
+
+import StatusBadge from "../components/StatusBadge";
 
 const API = "http://localhost:5000/api";
 
@@ -12,20 +22,24 @@ function IssueDetails() {
     const [issue, setIssue] = useState(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const [messageType, setMessageType] = useState("success");
+    const [updating, setUpdating] = useState(false);
 
     const fetchIssue = async () => {
         try {
             setLoading(true);
-            setError("");
+            setMessage("");
 
             const response = await axios.get(`${API}/issues/${id}`);
             setIssue(response.data.issue);
+
         } catch (err) {
-            setError(
+            setMessage(
                 err.response?.data?.message ||
                 "Unable to load this issue."
             );
+            setMessageType("error");
+
         } finally {
             setLoading(false);
         }
@@ -39,18 +53,27 @@ function IssueDetails() {
         const status = event.target.value;
 
         try {
+            setUpdating(true);
+            setMessage("");
+
             const response = await axios.patch(
                 `${API}/issues/${id}`,
                 { status }
             );
 
             setIssue(response.data.issue);
-            setMessage("Issue status updated successfully.");
+            setMessage("The issue status has been updated.");
+            setMessageType("success");
+
         } catch (err) {
             setMessage(
                 err.response?.data?.message ||
                 "Failed to update issue."
             );
+            setMessageType("error");
+
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -64,40 +87,90 @@ function IssueDetails() {
         try {
             await axios.delete(`${API}/issues/${id}`);
             navigate("/issues");
+
         } catch (err) {
             setMessage(
                 err.response?.data?.message ||
                 "Failed to delete issue."
             );
+            setMessageType("error");
         }
     };
 
     if (loading) {
-        return <main className="details-page"><p>Loading issue...</p></main>;
-    }
-
-    if (error) {
         return (
             <main className="details-page">
-                <p>{error}</p>
-                <button onClick={() => navigate("/issues")}>
-                    Back to Issues
-                </button>
+                <div className="loading-message">
+                    <RefreshCw size={20} />
+                    <p>Loading issue details...</p>
+                </div>
             </main>
         );
     }
 
-    if (!issue) return null;
+    if (!issue) {
+        return (
+            <main className="details-page">
+
+                <div className="directory-empty">
+                    <h2>Issue not found.</h2>
+
+                    <p>
+                        This report may have been removed
+                        or is no longer available.
+                    </p>
+
+                    <button
+                        className="primary-button"
+                        onClick={() => navigate("/issues")}
+                    >
+                        <ArrowLeft size={15} />
+                        Back to issues
+                    </button>
+                </div>
+
+            </main>
+        );
+    }
 
     return (
         <main className="details-page">
-            <div className="details-container">
-                <p className="eyebrow">CAMPUS ISSUE</p>
 
-                <h1>{issue.title}</h1>
-                <p className="location">{issue.location}</p>
+            <div className="details-container">
+
+                <button
+                    className="back-link"
+                    onClick={() => navigate("/issues")}
+                >
+                    <ArrowLeft size={15} />
+                    All campus issues
+                </button>
+
+                <div className="details-intro">
+
+                    <p className="eyebrow">
+                        CAMPUS ISSUE RECORD
+                    </p>
+
+                    <div className="details-status">
+                        <StatusBadge status={issue.status} />
+
+                        <span className="category">
+                            {issue.category}
+                        </span>
+                    </div>
+
+                    <h1>{issue.title}</h1>
+
+                    <p className="details-location">
+                        <MapPin size={15} />
+                        {issue.location}
+                    </p>
+
+                </div>
 
                 <div className="details-grid">
+
                     <div>
                         <span>Category</span>
                         <strong>{issue.category}</strong>
@@ -114,62 +187,129 @@ function IssueDetails() {
                     </div>
 
                     <div>
-                        <span>Created</span>
+                        <span>Reported on</span>
                         <strong>
                             {issue.createdAt
-                                ? new Date(issue.createdAt).toLocaleDateString()
+                                ? new Date(issue.createdAt)
+                                    .toLocaleDateString("en-IN")
                                 : "N/A"}
                         </strong>
                     </div>
+
                 </div>
 
                 <section className="issue-description">
-                    <h2>Description</h2>
+
+                    <p className="eyebrow">
+                        THE REPORT
+                    </p>
+
+                    <h2>What happened?</h2>
+
                     <p>{issue.description}</p>
+
                 </section>
+
                 {issue.imageUrl && (
                     <section className="issue-image-section">
-                        <h2>Attached Photograph</h2>
+
+                        <h2>
+                            <ImageIcon size={17} />
+                            Attached photograph
+                        </h2>
 
                         <img
                             src={`http://localhost:5000${issue.imageUrl}`}
                             alt="Photograph of the reported campus issue"
                             className="issue-detail-image"
                         />
+
                     </section>
                 )}
 
-                <label htmlFor="issue-status">Update status</label>
-                <select
-                    id="issue-status"
-                    value={issue.status}
-                    onChange={updateStatus}
-                >
-                    <option value="Reported">Reported</option>
-                    <option value="Under Investigation">
-                        Under Investigation
-                    </option>
-                    <option value="Action Taken">Action Taken</option>
-                    <option value="Resolved">Resolved</option>
-                </select>
+                <section className="status-update-section">
 
-                {message && <p>{message}</p>}
+                    <div>
+                        <p className="eyebrow">
+                            MANAGEMENT
+                        </p>
+
+                        <h2>Update issue status</h2>
+
+                        <p>
+                            Record the latest progress
+                            on this campus concern.
+                        </p>
+                    </div>
+
+                    <label htmlFor="issue-status">
+                        Current status
+                    </label>
+
+                    <select
+                        id="issue-status"
+                        value={issue.status}
+                        onChange={updateStatus}
+                        disabled={updating}
+                    >
+                        <option value="Reported">
+                            Reported
+                        </option>
+
+                        <option value="Under Investigation">
+                            Under Investigation
+                        </option>
+
+                        <option value="Action Taken">
+                            Action Taken
+                        </option>
+
+                        <option value="Resolved">
+                            Resolved
+                        </option>
+                    </select>
+
+                    {updating && (
+                        <p className="form-hint">
+                            Updating status...
+                        </p>
+                    )}
+
+                </section>
+
+                {message && (
+                    <p
+                        className={
+                            messageType === "error"
+                                ? "error-message"
+                                : "success-message"
+                        }
+                        role="status"
+                    >
+                        {message}
+                    </p>
+                )}
 
                 <div className="issue-actions">
+
                     <button
                         className="secondary-button"
                         onClick={() => navigate("/issues")}
                     >
-                        Back to Issues
+                        <ArrowLeft size={14} />
+                        Back to issues
                     </button>
 
                     <button
-                        className="primary-button"
+                        className="delete-button"
                         onClick={deleteIssue}
                     >
-                        Delete Issue
+                        <Trash2 size={14} />
+                        Delete issue
                     </button>
+
                 </div>
+
             </div>
         </main>
     );
