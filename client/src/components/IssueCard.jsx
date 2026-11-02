@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
 
@@ -25,6 +24,11 @@ function IssueCard({ issue }) {
 
             <p>
                 Severity: <strong>{issue.severity}</strong>
+            </p>
+
+            <p>
+                Reports from students:{" "}
+                <strong>{issue.reportCount || 1}</strong>
             </p>
         </Link>
     );

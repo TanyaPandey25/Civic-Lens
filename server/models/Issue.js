@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const issueSchema = new mongoose.Schema(
@@ -29,7 +28,7 @@ const issueSchema = new mongoose.Schema(
         severity: {
             type: String,
             enum: ["Low", "Medium", "High"],
-            default: "Medium"
+            default: "Low"
         },
         status: {
             type: String,

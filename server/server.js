@@ -1,4 +1,3 @@
-
 const dns = require("dns");
 dns.setServers(["8.8.8.8"]);
 
@@ -68,7 +67,7 @@ app.use(express.json());
 // Serve uploaded images
 app.use("/uploads", express.static(uploadDir));
 
-// Helper: remove uploaded image
+// Remove uploaded image
 const removeUploadedFile = (imageUrl) => {
     if (!imageUrl) return;
 
@@ -80,19 +79,101 @@ const removeUploadedFile = (imageUrl) => {
     }
 };
 
-// Helper: format issue response
-const formatIssue = (issue) => ({
+// Normalize location and category for comparison
+const normalizeValue = (value) => {
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[.,;:!?]/g, "")
+        .replace(/\s+/g, " ");
+};
+
+// Calculate severity based on report count
+const calculateSeverity = (count) => {
+    if (count >= 6) {
+        return "High";
+    }
+
+    if (count >= 3) {
+        return "Medium";
+    }
+
+    return "Low";
+};
+
+// Format issue response
+const formatIssue = (issue, reportCount = 1) => ({
     id: issue._id.toString(),
     title: issue.title,
     description: issue.description,
     location: issue.location,
     category: issue.category,
     severity: issue.severity,
+    reportCount,
     status: issue.status,
     imageUrl: issue.imageUrl || "",
     createdAt: issue.createdAt,
     updatedAt: issue.updatedAt
 });
+
+// Calculate and update severity for all issues
+const getIssuesWithCalculatedSeverity = async () => {
+    const issues = await Issue.find().sort({ createdAt: -1 });
+
+    const groups = new Map();
+
+    // Group reports by location and category
+    for (const issue of issues) {
+        const locationKey = normalizeValue(issue.location);
+        const categoryKey = normalizeValue(issue.category);
+
+        const groupKey = JSON.stringify([
+            locationKey,
+            categoryKey
+        ]);
+
+        if (!groups.has(groupKey)) {
+            groups.set(groupKey, []);
+        }
+
+        groups.get(groupKey).push(issue);
+    }
+
+    const updates = [];
+    const formattedIssues = [];
+
+    // Calculate severity for each group
+    for (const group of groups.values()) {
+        const reportCount = group.length;
+        const severity = calculateSeverity(reportCount);
+
+        for (const issue of group) {
+            if (issue.severity !== severity) {
+                updates.push({
+                    updateOne: {
+                        filter: { _id: issue._id },
+                        update: {
+                            $set: { severity }
+                        }
+                    }
+                });
+
+                issue.severity = severity;
+            }
+
+            formattedIssues.push(
+                formatIssue(issue, reportCount)
+            );
+        }
+    }
+
+    // Save updated severity values in MongoDB
+    if (updates.length > 0) {
+        await Issue.bulkWrite(updates);
+    }
+
+    return formattedIssues;
+};
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -103,78 +184,100 @@ app.get("/api/health", (req, res) => {
 });
 
 // CREATE: Submit a new campus issue
-app.post("/api/reports", (req, res, next) => {
-    upload.single("image")(req, res, (error) => {
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.message
+app.post(
+    "/api/reports",
+    (req, res, next) => {
+        upload.single("image")(req, res, (error) => {
+            if (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            next();
+        });
+    },
+    async (req, res) => {
+        let issueCreated = false;
+
+        try {
+            const {
+                description,
+                location,
+                category
+            } = req.body;
+
+            if (
+                typeof description !== "string" ||
+                !description.trim() ||
+                typeof location !== "string" ||
+                !location.trim()
+            ) {
+                if (req.file) {
+                    removeUploadedFile(req.file.filename);
+                }
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Description and location are required"
+                });
+            }
+
+            const imageUrl = req.file
+                ? `/uploads/${req.file.filename}`
+                : "";
+
+            const issue = await Issue.create({
+                title: description.trim().slice(0, 60),
+                description: description.trim(),
+                location: location.trim(),
+                category: category || "General",
+                severity: "Low",
+                imageUrl
             });
-        }
 
-        next();
-    });
-}, async (req, res) => {
-    try {
-        const { description, location, category, severity } = req.body;
+            issueCreated = true;
 
-        if (
-            typeof description !== "string" ||
-            !description.trim() ||
-            typeof location !== "string" ||
-            !location.trim()
-        ) {
-            if (req.file) {
+            // Recalculate severity for all matching reports
+            const updatedIssues =
+                await getIssuesWithCalculatedSeverity();
+
+            const createdReport = updatedIssues.find(
+                (item) => item.id === issue._id.toString()
+            );
+
+            return res.status(201).json({
+                success: true,
+                message: "Report submitted and saved successfully",
+                report: createdReport
+            });
+
+        } catch (error) {
+            if (req.file && !issueCreated) {
                 removeUploadedFile(req.file.filename);
             }
 
-            return res.status(400).json({
+            console.error("Create issue error:", error.message);
+
+            return res.status(500).json({
                 success: false,
-                message: "Description and location are required"
+                message: "Failed to save the report"
             });
         }
-
-        const imageUrl = req.file
-            ? `/uploads/${req.file.filename}`
-            : "";
-
-        const issue = await Issue.create({
-            title: description.trim().slice(0, 60),
-            description: description.trim(),
-            location: location.trim(),
-            category: category || "General",
-            severity: severity || "Medium",
-            imageUrl
-        });
-
-        return res.status(201).json({
-            success: true,
-            message: "Report submitted and saved successfully",
-            report: formatIssue(issue)
-        });
-    } catch (error) {
-        if (req.file) {
-            removeUploadedFile(req.file.filename);
-        }
-
-        console.error("Create issue error:", error.message);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to save the report"
-        });
     }
-});
+);
 
 // READ: Get all issues
 app.get("/api/issues", async (req, res) => {
     try {
-        const issues = await Issue.find().sort({ createdAt: -1 });
+        const issues = await getIssuesWithCalculatedSeverity();
 
         return res.json({
             success: true,
-            issues: issues.map(formatIssue)
+            issues
         });
+
     } catch (error) {
         console.error("Fetch issues error:", error.message);
 
@@ -197,7 +300,11 @@ app.get("/api/issues/:id", async (req, res) => {
             });
         }
 
-        const issue = await Issue.findById(id);
+        const issues = await getIssuesWithCalculatedSeverity();
+
+        const issue = issues.find(
+            (item) => item.id === id
+        );
 
         if (!issue) {
             return res.status(404).json({
@@ -208,8 +315,9 @@ app.get("/api/issues/:id", async (req, res) => {
 
         return res.json({
             success: true,
-            issue: formatIssue(issue)
+            issue
         });
+
     } catch (error) {
         console.error("Fetch issue error:", error.message);
 
@@ -237,7 +345,6 @@ app.patch("/api/issues/:id", async (req, res) => {
             "description",
             "location",
             "category",
-            "severity",
             "status"
         ];
 
@@ -256,23 +363,35 @@ app.patch("/api/issues/:id", async (req, res) => {
             });
         }
 
-        const issue = await Issue.findByIdAndUpdate(id, updates, {
-            new: true,
-            runValidators: true
-        });
+        const updatedIssue = await Issue.findByIdAndUpdate(
+            id,
+            updates,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
 
-        if (!issue) {
+        if (!updatedIssue) {
             return res.status(404).json({
                 success: false,
                 message: "Issue not found"
             });
         }
 
+        // Recalculate after location or category changes too
+        const issues = await getIssuesWithCalculatedSeverity();
+
+        const issue = issues.find(
+            (item) => item.id === id
+        );
+
         return res.json({
             success: true,
             message: "Issue updated successfully",
-            issue: formatIssue(issue)
+            issue
         });
+
     } catch (error) {
         console.error("Update issue error:", error.message);
 
@@ -306,10 +425,14 @@ app.delete("/api/issues/:id", async (req, res) => {
 
         removeUploadedFile(issue.imageUrl);
 
+        // Recalculate severity after deletion
+        await getIssuesWithCalculatedSeverity();
+
         return res.json({
             success: true,
             message: "Issue deleted successfully"
         });
+
     } catch (error) {
         console.error("Delete issue error:", error.message);
 
@@ -320,7 +443,7 @@ app.delete("/api/issues/:id", async (req, res) => {
     }
 });
 
-// Handle upload errors
+// Handle unexpected server errors
 app.use((error, req, res, next) => {
     console.error("Server error:", error.message);
 
@@ -350,6 +473,7 @@ async function startServer() {
         app.listen(PORT, () => {
             console.log(`CivicLens backend running on port ${PORT}`);
         });
+
     } catch (error) {
         console.error("\nMongoDB connection failed:", error.message);
 
