@@ -127,6 +127,17 @@ function IssueDetails() {
                     <h2>Description</h2>
                     <p>{issue.description}</p>
                 </section>
+                {issue.imageUrl && (
+                    <section className="issue-image-section">
+                        <h2>Attached Photograph</h2>
+
+                        <img
+                            src={`http://localhost:5000${issue.imageUrl}`}
+                            alt="Photograph of the reported campus issue"
+                            className="issue-detail-image"
+                        />
+                    </section>
+                )}
 
                 <label htmlFor="issue-status">Update status</label>
                 <select

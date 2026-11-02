@@ -18,6 +18,10 @@ const issueSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+        imageUrl: {
+            type: String,
+            default: ""
+        },
         category: {
             type: String,
             default: "General"
