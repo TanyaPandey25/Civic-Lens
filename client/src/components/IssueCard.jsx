@@ -4,7 +4,11 @@ import StatusBadge from "./StatusBadge";
 
 function IssueCard({ issue }) {
     return (
-        <div className="issue-card">
+        <Link
+            to={`/issues/${issue.id}`}
+            className="issue-card"
+            aria-label={`View details for ${issue.title}`}
+        >
             <div className="issue-card-top">
                 <span className="category">
                     {issue.category}
@@ -22,14 +26,7 @@ function IssueCard({ issue }) {
             <p>
                 Severity: <strong>{issue.severity}</strong>
             </p>
-
-            <Link
-                to={`/issues/${issue.id}`}
-                className="view-details-btn"
-            >
-                View Details →
-            </Link>
-        </div>
+        </Link>
     );
 }
 
