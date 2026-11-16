@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import {
     ArrowUpRight,
     MapPin,
-    Image as ImageIcon,
     Check,
     ClipboardList,
-    CircleCheck
+    CircleCheck,
+    Activity
 } from "lucide-react";
 
 const API = "http://localhost:5000/api";
@@ -16,6 +16,37 @@ const STATUSES = [
     "Under Investigation",
     "Action Taken",
     "Resolved"
+];
+
+const PROCESS_STAGES = [
+    {
+        number: "01",
+        label: "THE FIRST SIGNAL",
+        title: "Notice it. Report it.",
+        description:
+            "Every improvement begins when someone speaks up. Share what happened and where."
+    },
+    {
+        number: "02",
+        label: "SEE THE BIGGER PICTURE",
+        title: "Understand the pattern.",
+        description:
+            "Individual reports help reveal recurring concerns and areas that need attention."
+    },
+    {
+        number: "03",
+        label: "MOVE TOWARDS CHANGE",
+        title: "Turn insight into action.",
+        description:
+            "Follow each concern as it moves through the campus resolution process."
+    },
+    {
+        number: "04",
+        label: "A BETTER CAMPUS",
+        title: "Make progress visible.",
+        description:
+            "Every resolved issue is a step towards a safer, better-maintained campus."
+    }
 ];
 
 function Home() {
@@ -105,11 +136,7 @@ function Home() {
     }, {});
 
     const totalIssues = issues.length;
-
-    const maxStatusCount = Math.max(
-        ...Object.values(statusCounts),
-        1
-    );
+    const resolvedCount = statusCounts["Resolved"];
 
     const latestIssue = [...issues].sort(
         (a, b) =>
@@ -120,8 +147,6 @@ function Home() {
     const currentStage = latestIssue
         ? STATUSES.indexOf(latestIssue.status)
         : -1;
-
-    const resolvedCount = statusCounts["Resolved"];
 
     return (
         <main>
@@ -179,335 +204,192 @@ function Home() {
                 </div>
             </section>
 
-            {/* HOW IT WORKS */}
+            {/* CAMPUS PULSE */}
 
-            <section className="how-section">
+            <section
+                className="campus-pulse"
+                aria-labelledby="pulse-title"
+            >
 
-                <div className="section-heading">
+                <div className="pulse-heading">
+
                     <p className="eyebrow">
-                        THE PROCESS
+                        CAMPUS PULSE / THE JOURNEY
                     </p>
 
-                    <h2>
-                        From experience to action.
+                    <h2 id="pulse-title">
+                        Every report moves
+                        <span> campus forward.</span>
                     </h2>
 
                     <p>
-                        A simple process that makes campus
-                        concerns easier to communicate,
-                        understand and resolve.
+                        From the first observation to a visible
+                        resolution. Small actions create meaningful
+                        change across campus.
                     </p>
+
                 </div>
 
-                <div className="steps">
+                <div className="pulse-layout">
 
-                    {/* 01 — DESCRIBE */}
+                    {/* CONNECTED PROCESS */}
 
-                    <article className="step visual-step">
+                    <div className="pulse-timeline">
 
-                        <div className="step-heading">
-                            <span>01</span>
-                            <span className="step-indicator">
-                                REPORTING
-                            </span>
-                        </div>
+                        {PROCESS_STAGES.map((stage, index) => {
+                            const completed =
+                                currentStage > index;
 
-                        <h3>Describe</h3>
+                            const active =
+                                currentStage === index;
 
-                        <p>
-                            Tell us what happened and where.
-                            Add a photograph if it helps.
-                        </p>
+                            return (
+                                <article
+                                    className={`pulse-stage ${
+                                        completed ? "is-completed" : ""
+                                    }`}
+                                >
 
-                        <div className="step-visual describe-visual">
-
-                            <div className="demo-window">
-
-                                <div className="demo-window-top">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-
-                                    <small>NEW REPORT</small>
-                                </div>
-
-                                <div className="demo-form">
-
-                                    <div className="demo-form-label">
-                                        DESCRIBE THE ISSUE
+                                    <div className="pulse-stage-marker">
+                                        <span className="pulse-stage-number">
+                                            {completed ? (
+                                                <Check size={15} />
+                                            ) : (
+                                                stage.number
+                                            )}
+                                        </span>
                                     </div>
 
-                                    <div className="typing-line">
-                                        Broken lights in the corridor
-                                    </div>
+                                    <div className="pulse-stage-content">
 
-                                    <div className="demo-form-label">
-                                        LOCATION
-                                    </div>
+                                        <div className="pulse-stage-meta">
+                                            <span>{stage.label}</span>
 
-                                    <div className="demo-input">
-                                        <MapPin size={10} />
-                                        CSE Block, 2nd Floor
-                                    </div>
-
-                                    <div className="demo-form-label">
-                                        ATTACH PHOTOGRAPH
-                                    </div>
-
-                                    <div className="demo-upload">
-
-                                        <div className="demo-photo">
-                                            <ImageIcon size={15} />
+                                            {active && (
+                                                <span className="pulse-current-label">
+                                                    LATEST ISSUE HERE
+                                                </span>
+                                            )}
                                         </div>
 
-                                        <div>
-                                            <strong>
-                                                campus-issue.jpg
-                                            </strong>
+                                        <h3>{stage.title}</h3>
 
-                                            <small>
-                                                Photograph attached
-                                            </small>
-                                        </div>
+                                        <p>{stage.description}</p>
 
-                                        <Check
-                                            size={14}
-                                            color="#427B62"
-                                        />
                                     </div>
 
-                                    <div className="demo-submit">
-                                        Report submitted
-                                        <Check size={12} />
-                                    </div>
+                                </article>
+                            );
+                        })}
 
-                                </div>
-                            </div>
-                        </div>
-                    </article>
+                    </div>
 
-                    {/* 02 — UNDERSTAND */}
+                    {/* LIVE CAMPUS SNAPSHOT */}
 
-                    <article className="step visual-step">
+                    <aside className="pulse-side">
 
-                        <div className="step-heading">
-                            <span>02</span>
-                            <span className="step-indicator live-indicator">
-                                LIVE ANALYTICS
-                            </span>
-                        </div>
+                        <div className="pulse-live-card">
 
-                        <h3>Understand</h3>
+                            <div className="pulse-card-header">
 
-                        <p>
-                            Identify patterns across reported
-                            campus problems.
-                        </p>
-
-                        <div className="step-visual analytics-visual">
-
-                            <div className="analytics-top">
-                                <div>
-                                    <small>TOTAL REPORTS</small>
-                                    <strong>{totalIssues}</strong>
+                                <div className="pulse-card-heading">
+                                    <Activity size={16} />
+                                    <span>LIVE CAMPUS SNAPSHOT</span>
                                 </div>
 
-                                <span className="analytics-live-dot">
+                                <span className="pulse-live-indicator">
+                                    <span className="live-dot"></span>
                                     LIVE
                                 </span>
-                            </div>
-
-                            <div className="analytics-bars">
-
-                                {STATUSES.map((status, index) => (
-                                    <div
-                                        className="analytics-row"
-                                        key={status}
-                                    >
-                                        <div className="analytics-label">
-
-                                            <span
-                                                className={`status-dot status-dot-${index}`}
-                                            />
-
-                                            <span>{status}</span>
-
-                                            <strong>
-                                                {statusCounts[status]}
-                                            </strong>
-                                        </div>
-
-                                        <div className="analytics-track">
-                                            <div
-                                                className={`analytics-fill analytics-fill-${index}`}
-                                                style={{
-                                                    width: `${
-                                                        (statusCounts[status] /
-                                                        maxStatusCount) * 100
-                                                    }%`
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
 
                             </div>
 
-                            <div className="analytics-footer">
-                                <span>ISSUE DISTRIBUTION</span>
-                                <span>Updates every 10 sec</span>
-                            </div>
-                        </div>
-                    </article>
+                            <div className="pulse-total">
 
-                    {/* 03 — TRACK */}
-
-                    <article className="step visual-step">
-
-                        <div className="step-heading">
-                            <span>03</span>
-                            <span className="step-indicator live-indicator">
-                                LIVE STATUS
-                            </span>
-                        </div>
-
-                        <h3>Track</h3>
-
-                        <p>
-                            Follow reported issues through
-                            every stage of progress.
-                        </p>
-
-                        <div className="step-visual track-visual">
-
-                            <div className="track-ticket">
+                                <span className="pulse-stat-label">
+                                    TOTAL REPORTED ISSUES
+                                </span>
 
                                 <div>
-                                    <small>
-                                        LATEST REPORTED ISSUE
-                                    </small>
+                                    {totalIssues.toString().padStart(2, "0")}
+                                    <span> reports</span>
+                                </div>
+
+                            </div>
+
+                            <div className="pulse-stat-grid">
+
+                                <div className="pulse-stat">
+                                    <span className="pulse-stat-label">
+                                        RESOLVED
+                                    </span>
+
+                                    <strong>{resolvedCount}</strong>
+                                </div>
+
+                                <div className="pulse-stat">
+                                    <span className="pulse-stat-label">
+                                        IN PROGRESS
+                                    </span>
 
                                     <strong>
-                                        {latestIssue
-                                            ? latestIssue.title
-                                            : "Waiting for a report"}
+                                        {statusCounts["Under Investigation"] +
+                                            statusCounts["Action Taken"]}
                                     </strong>
                                 </div>
 
-                                <ArrowUpRight
-                                    size={17}
-                                    color="#286A64"
-                                />
                             </div>
 
-                            <div className="track-location">
-                                <MapPin size={11} />
-                                {latestIssue?.location || "Campus location"}
-                            </div>
+                            <div className="pulse-latest">
 
-                            <div className="track-timeline">
+                                <div className="pulse-latest-heading">
+                                    <span>RECENT CAMPUS CONCERN</span>
+                                    <ArrowUpRight size={16} />
+                                </div>
 
-                                {STATUSES.map((status, index) => {
-                                    const completed =
-                                        currentStage >= index;
+                                {latestIssue ? (
+                                    <>
+                                        <h3>{latestIssue.title}</h3>
 
-                                    return (
-                                        <div
-                                            className={`track-stage ${
-                                                completed ? "completed" : ""
-                                            } ${
-                                                currentStage === index
-                                                    ? "active"
-                                                    : ""
-                                            }`}
-                                            key={status}
-                                        >
-                                            <span className="track-stage-dot">
-                                                {completed && (
-                                                    <Check size={9} />
-                                                )}
-                                            </span>
+                                        <p className="pulse-latest-location">
+                                            <MapPin size={13} />
+                                            {latestIssue.location || "Campus location"}
+                                        </p>
 
-                                            <span>{status}</span>
+                                        <div className="pulse-latest-status">
+                                            <span className="pulse-status-dot"></span>
+                                            {latestIssue.status}
                                         </div>
-                                    );
-                                })}
+                                    </>
+                                ) : (
+                                    <div className="pulse-empty">
+                                        <CircleCheck size={22} />
+
+                                        <p>
+                                            No reports yet. Your first
+                                            report can start the change.
+                                        </p>
+                                    </div>
+                                )}
 
                             </div>
 
-                            <div className="track-footer">
-                                {latestIssue
-                                    ? `Current status: ${latestIssue.status}`
-                                    : "Submit an issue to see its progress"}
+                            <div className="pulse-card-footer">
+                                <span>COMMUNITY-DRIVEN CHANGE</span>
+                                <span>CIVICLENS</span>
                             </div>
-                        </div>
-                    </article>
 
-                    {/* 04 — RESOLVE */}
-
-                    <article className="step visual-step">
-
-                        <div className="step-heading">
-                            <span>04</span>
-                            <span className="step-indicator">
-                                CAMPUS IMPACT
-                            </span>
                         </div>
 
-                        <h3>Resolve</h3>
-
-                        <p>
-                            Track progress and see how many
-                            reported problems have been resolved.
+                        <p className="pulse-side-note">
+                            Every voice matters.
+                            <span> Every report counts.</span>
                         </p>
 
-                        <div className="step-visual resolve-visual">
-
-                            <div className="resolve-circle">
-
-                                <svg
-                                    viewBox="0 0 100 100"
-                                    className="resolve-ring"
-                                >
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="43"
-                                        className="resolve-ring-bg"
-                                    />
-
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r="43"
-                                        className="resolve-ring-progress"
-                                    />
-                                </svg>
-
-                                <CircleCheck
-                                    size={35}
-                                    color="#286A64"
-                                    strokeWidth={1.5}
-                                />
-                            </div>
-
-                            <strong>
-                                Progress matters.
-                            </strong>
-
-                            <div className="resolve-stat">
-                                <span>Issues resolved</span>
-                                <strong>{resolvedCount}</strong>
-                            </div>
-
-                            <div className="resolve-caption">
-                                Every resolved issue makes
-                                campus a better place.
-                            </div>
-                        </div>
-                    </article>
+                    </aside>
 
                 </div>
+
             </section>
 
         </main>

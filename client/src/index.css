@@ -2542,3 +2542,655 @@ hr {
         padding: 75px 23px;
     }
 }
+
+
+/* =====================================================
+   CIVICLENS — CAMPUS PULSE
+   Editorial timeline · Live campus snapshot
+===================================================== */
+
+.campus-pulse {
+    position: relative;
+    overflow: hidden;
+    padding: 95px 7% 105px;
+    background:
+        radial-gradient(
+            ellipse at 88% 48%,
+            rgba(154, 185, 165, 0.09),
+            transparent 38%
+        ),
+        var(--bg);
+}
+
+.pulse-heading {
+    max-width: 740px;
+    margin-bottom: 65px;
+}
+
+.pulse-heading h2 {
+    margin-bottom: 15px;
+    color: var(--forest);
+    font-size: clamp(34px, 4.5vw, 51px);
+    font-weight: 500;
+    letter-spacing: -2px;
+    line-height: 1.15;
+}
+
+.pulse-heading h2 span {
+    color: var(--teal);
+    font-family: "Playfair Display", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.pulse-heading > p:last-child {
+    max-width: 570px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+/* Main layout */
+
+.pulse-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+    align-items: center;
+    gap: clamp(45px, 8vw, 115px);
+}
+
+/* Connected timeline */
+
+.pulse-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0;
+}
+
+.pulse-timeline::before {
+    position: absolute;
+    content: "";
+    top: 30px;
+    bottom: 30px;
+    left: 22px;
+    width: 1px;
+    background: var(--border-strong);
+}
+
+.pulse-timeline::after {
+    position: absolute;
+    content: "";
+    top: 30px;
+    left: 22px;
+    width: 1px;
+    height: 45%;
+    background: linear-gradient(
+        to bottom,
+        var(--champagne),
+        var(--jade),
+        transparent
+    );
+    animation: pulse-line 5s ease-in-out infinite alternate;
+}
+
+.pulse-stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 22px;
+    padding: 0 0 43px;
+}
+
+.pulse-stage:last-child {
+    padding-bottom: 0;
+}
+
+.pulse-stage-marker {
+    position: relative;
+    z-index: 2;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    transition:
+        background 250ms ease,
+        border-color 250ms ease,
+        transform 250ms ease;
+}
+
+.pulse-stage-number {
+    color: var(--text-subtle);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 16px;
+    transition: color 250ms ease;
+}
+
+.pulse-stage-content {
+    padding: 3px 0 0;
+}
+
+.pulse-stage-meta {
+    min-height: 17px;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    color: var(--text-subtle);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.pulse-stage-content h3 {
+    margin-bottom: 7px;
+    color: var(--forest);
+    font-size: 21px;
+    font-weight: 550;
+    letter-spacing: -0.5px;
+    transition: color 250ms ease;
+}
+
+.pulse-stage-content > p {
+    max-width: 430px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+.pulse-stage.is-completed .pulse-stage-marker {
+    color: white;
+    background: var(--teal);
+    border-color: var(--teal);
+}
+
+.pulse-stage.is-completed .pulse-stage-number {
+    display: grid;
+    place-items: center;
+    color: white;
+}
+
+.pulse-stage.is-active .pulse-stage-marker {
+    background: var(--jade-light);
+    border-color: var(--teal);
+    box-shadow: 0 0 0 6px rgba(154, 185, 165, 0.13);
+    transform: scale(1.04);
+}
+
+.pulse-stage.is-active .pulse-stage-number {
+    color: var(--accent);
+}
+
+.pulse-stage.is-active h3 {
+    color: var(--teal);
+}
+
+.pulse-current-label {
+    padding: 3px 7px;
+    color: var(--success);
+    background: var(--surface-soft);
+    border-radius: 3px;
+    font-size: 7px;
+    letter-spacing: 0.8px;
+}
+
+/* Live campus snapshot */
+
+.pulse-side {
+    width: 100%;
+    max-width: 420px;
+    justify-self: end;
+}
+
+.pulse-live-card {
+    position: relative;
+    overflow: hidden;
+    padding: 25px;
+
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--jade);
+    border-radius: 8px;
+
+    box-shadow: 0 16px 45px rgba(29, 61, 51, 0.07);
+}
+
+.pulse-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 19px;
+    border-bottom: 1px solid var(--border);
+}
+
+.pulse-card-heading,
+.pulse-live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pulse-card-heading {
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.pulse-card-heading svg {
+    color: var(--teal);
+}
+
+.pulse-live-indicator {
+    color: var(--success);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.pulse-live-indicator .live-dot {
+    width: 6px;
+    height: 6px;
+}
+
+.pulse-total {
+    padding: 24px 0 22px;
+}
+
+.pulse-stat-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-subtle);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.pulse-total > div {
+    color: var(--forest);
+    font-size: 49px;
+    font-weight: 550;
+    letter-spacing: -2.5px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.pulse-total > div span {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.pulse-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.pulse-stat {
+    padding: 17px 10px 17px 0;
+}
+
+.pulse-stat + .pulse-stat {
+    padding-left: 18px;
+    border-left: 1px solid var(--border);
+}
+
+.pulse-stat strong {
+    color: var(--forest);
+    font-size: 24px;
+    font-weight: 550;
+    font-variant-numeric: tabular-nums;
+}
+
+.pulse-latest {
+    margin-top: 22px;
+    padding: 17px;
+    background: var(--surface-soft);
+    border-radius: 5px;
+}
+
+.pulse-latest-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 13px;
+
+    color: var(--text-subtle);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.pulse-latest-heading svg {
+    color: var(--teal);
+}
+
+.pulse-latest h3 {
+    margin-bottom: 9px;
+    color: var(--forest);
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.pulse-latest-location {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    color: var(--text-muted);
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+.pulse-latest-location svg {
+    flex-shrink: 0;
+    color: var(--teal);
+}
+
+.pulse-latest-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+
+    color: var(--success);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.pulse-status-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    background: var(--success);
+    border-radius: 50%;
+}
+
+.pulse-empty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+}
+
+.pulse-empty svg {
+    flex-shrink: 0;
+    color: var(--teal);
+}
+
+.pulse-empty p {
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.pulse-card-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+
+    color: var(--text-subtle);
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.pulse-side-note {
+    margin-top: 19px;
+    color: var(--text-muted);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 16px;
+    font-style: italic;
+    text-align: right;
+}
+
+.pulse-side-note span {
+    color: var(--teal);
+}
+
+/* Animations */
+
+@keyframes pulse-line {
+    from {
+        transform: scaleY(0.55);
+        transform-origin: top;
+        opacity: 0.55;
+    }
+
+    to {
+        transform: scaleY(1);
+        transform-origin: top;
+        opacity: 1;
+    }
+}
+
+/* Dark theme */
+
+:root[data-theme="dark"] .campus-pulse {
+    background:
+        radial-gradient(
+            ellipse at 88% 48%,
+            rgba(154, 185, 165, 0.07),
+            transparent 38%
+        ),
+        var(--bg);
+}
+
+:root[data-theme="dark"] .pulse-heading h2,
+:root[data-theme="dark"] .pulse-stage-content h3,
+:root[data-theme="dark"] .pulse-total > div,
+:root[data-theme="dark"] .pulse-stat strong,
+:root[data-theme="dark"] .pulse-latest h3 {
+    color: #DDE9DE;
+}
+
+:root[data-theme="dark"] .pulse-heading h2 span,
+:root[data-theme="dark"] .pulse-side-note span {
+    color: var(--jade);
+}
+
+:root[data-theme="dark"] .pulse-stage-marker {
+    background: var(--bg);
+    border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .pulse-stage.is-completed .pulse-stage-marker {
+    background: var(--teal);
+    border-color: var(--teal);
+}
+
+:root[data-theme="dark"] .pulse-stage.is-active .pulse-stage-marker {
+    background: #29463C;
+    border-color: var(--jade);
+}
+
+:root[data-theme="dark"] .pulse-stage.is-active h3 {
+    color: var(--jade);
+}
+
+:root[data-theme="dark"] .pulse-live-card {
+    background: #1B302B;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="dark"] .pulse-latest {
+    background: #263F38;
+}
+
+:root[data-theme="dark"] .pulse-current-label {
+    color: #B9D9C1;
+    background: #294238;
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+    .pulse-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.85fr);
+        gap: 35px;
+    }
+
+    .pulse-stage {
+        gap: 15px;
+    }
+
+    .pulse-live-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 700px) {
+    .campus-pulse {
+        padding: 70px 23px 80px;
+    }
+
+    .pulse-heading {
+        margin-bottom: 45px;
+    }
+
+    .pulse-layout {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    .pulse-side {
+        max-width: none;
+    }
+
+    .pulse-stage {
+        padding-bottom: 35px;
+    }
+
+    .pulse-stage-content h3 {
+        font-size: 19px;
+    }
+
+    .pulse-side-note {
+        text-align: left;
+    }
+}
+
+@media (max-width: 400px) {
+    .pulse-live-card {
+        padding: 17px;
+    }
+
+    .pulse-total > div {
+        font-size: 42px;
+    }
+
+    .pulse-stage {
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .pulse-stage-marker {
+        width: 40px;
+        height: 40px;
+    }
+
+    .pulse-timeline::before,
+    .pulse-timeline::after {
+        left: 19px;
+    }
+}
+
+/* =====================================================
+   CIVICLENS — LIVE CAMPUS SNAPSHOT INTERACTIONS
+===================================================== */
+
+.pulse-live-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(154, 185, 165, 0.22);
+    transition:
+        transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 350ms ease,
+        box-shadow 350ms ease;
+    will-change: transform;
+}
+
+.pulse-live-card:hover {
+    transform: translateY(-8px) scale(1.012);
+    border-color: rgba(154, 185, 165, 0.8);
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.2),
+        0 0 22px rgba(94, 160, 133, 0.13);
+}
+
+/* Subtle highlight sweep */
+
+.pulse-live-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 70%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(
+        110deg,
+        transparent,
+        rgba(196, 225, 205, 0.055),
+        transparent
+    );
+    transition: left 700ms ease;
+}
+
+.pulse-live-card:hover::before {
+    left: 150%;
+}
+
+/* Highlight the recent concern panel */
+
+.pulse-latest {
+    transition:
+        background 300ms ease,
+        border-color 300ms ease;
+}
+
+.pulse-live-card:hover .pulse-latest {
+    background: rgba(154, 185, 165, 0.11);
+}
+
+/* Slight emphasis on the statistics */
+
+.pulse-stat strong,
+.pulse-total > div {
+    transition: color 300ms ease;
+}
+
+.pulse-live-card:hover .pulse-stat strong,
+.pulse-live-card:hover .pulse-total > div {
+    color: #B9D8C3;
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+    .pulse-live-card,
+    .pulse-live-card::before,
+    .pulse-latest,
+    .pulse-stat strong,
+    .pulse-total > div {
+        transition: none;
+    }
+
+    .pulse-live-card:hover {
+        transform: none;
+    }
+}
