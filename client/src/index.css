@@ -2375,3 +2375,141 @@ hr {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* =====================================================
+   EXPLORE ISSUES — FILTER PANEL
+===================================================== */
+
+.issue-filters {
+    margin: 12px 0 28px;
+    padding: 22px 24px;
+
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--jade);
+    border-radius: var(--radius-md);
+}
+
+.filters-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 21px;
+}
+
+.filters-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filters-title > svg {
+    flex-shrink: 0;
+    color: var(--teal);
+}
+
+.filters-title h2 {
+    color: var(--forest);
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.filters-title p {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+:root[data-theme="dark"] .filters-title h2 {
+    color: #DDE9DE;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px 20px;
+}
+
+.filter-field {
+    min-width: 0;
+}
+
+.filter-field label {
+    display: block;
+    margin: 0 0 6px;
+
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.filter-field select {
+    min-height: 43px;
+    padding: 9px 11px;
+    font-size: 12px;
+}
+
+.filter-field select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.clear-filters-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 8px 11px;
+
+    color: var(--teal);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    transition: var(--transition);
+}
+
+.clear-filters-button:hover {
+    background: var(--surface-soft);
+    border-color: var(--jade);
+}
+
+.filter-empty {
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 850px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 550px) {
+    .issue-filters {
+        padding: 18px 15px;
+    }
+
+    .filters-heading {
+        align-items: flex-start;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .filters-title {
+        align-items: flex-start;
+    }
+
+    .clear-filters-button {
+        font-size: 10px;
+        padding: 7px 8px;
+    }
+}
