@@ -72,7 +72,7 @@ function BrowseIssues() {
             setError("");
 
             const response = await axios.get(
-                "http://localhost:5000/api/issues"
+                "https://civiclens-backend-oru7.onrender.com/api/issues"
             );
 
             setIssues(

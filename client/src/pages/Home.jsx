@@ -9,7 +9,7 @@ import {
     Activity
 } from "lucide-react";
 
-const API = "http://localhost:5000/api";
+const API = "https://civiclens-backend-oru7.onrender.com/api";
 
 const STATUSES = [
     "Reported",

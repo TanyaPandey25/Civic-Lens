@@ -13,7 +13,7 @@ import {
 
 import StatusBadge from "../components/StatusBadge";
 
-const API = "http://localhost:5000/api";
+const API = "https://civiclens-backend-oru7.onrender.com/api";
 
 function IssueDetails() {
     const { id } = useParams();
@@ -219,7 +219,7 @@ function IssueDetails() {
                         </h2>
 
                         <img
-                            src={`http://localhost:5000${issue.imageUrl}`}
+                            src={`https://civiclens-backend-oru7.onrender.com${issue.imageUrl}`}
                             alt="Photograph of the reported campus issue"
                             className="issue-detail-image"
                         />

@@ -124,7 +124,7 @@ function ReportIssue() {
             }
 
             const response = await axios.post(
-                "http://localhost:5000/api/reports",
+                "https://civiclens-backend-oru7.onrender.com/api/reports",
                 formData
             );
 
