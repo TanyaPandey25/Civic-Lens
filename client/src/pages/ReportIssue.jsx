@@ -9,14 +9,38 @@ import {
     CheckCircle2
 } from "lucide-react";
 
+const buildings = [
+    "PJ Block",
+    "PG Block",
+    "Science Block",
+    "Mechanical Block",
+    "APS Block"
+];
+
+const floors = Array.from({ length: 7 }, (_, index) =>
+    String(index + 1)
+);
+
 function ReportIssue() {
     const [description, setDescription] = useState("");
-    const [location, setLocation] = useState("");
+
+    const [building, setBuilding] = useState("");
+    const [floor, setFloor] = useState("");
+    const [classroom, setClassroom] = useState("");
+
     const [image, setImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState("");
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("success");
     const [submitting, setSubmitting] = useState(false);
+
+    // Generate classroom names according to the selected floor.
+    // Example: Floor 1 -> CR-101 to CR-108.
+    const classrooms = floor
+        ? Array.from({ length: 8 }, (_, index) =>
+            `CR-${floor}0${index + 1}`
+        )
+        : [];
 
     useEffect(() => {
         if (!image) {
@@ -29,6 +53,19 @@ function ReportIssue() {
 
         return () => URL.revokeObjectURL(url);
     }, [image]);
+
+    const handleBuildingChange = (event) => {
+        setBuilding(event.target.value);
+        setFloor("");
+        setClassroom("");
+        setMessage("");
+    };
+
+    const handleFloorChange = (event) => {
+        setFloor(event.target.value);
+        setClassroom("");
+        setMessage("");
+    };
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -74,6 +111,9 @@ function ReportIssue() {
             setSubmitting(true);
             setMessage("");
 
+            const location =
+                `${building}, Floor ${floor}, ${classroom}`;
+
             const formData = new FormData();
 
             formData.append("description", description);
@@ -94,7 +134,9 @@ function ReportIssue() {
             setMessageType("success");
 
             setDescription("");
-            setLocation("");
+            setBuilding("");
+            setFloor("");
+            setClassroom("");
             setImage(null);
 
             const input = document.getElementById("issue-image");
@@ -183,20 +225,78 @@ function ReportIssue() {
                             minLength={5}
                         />
 
-                        <label htmlFor="issue-location">
-                            Where did it happen?
+                        <label htmlFor="issue-building">
+                            Select building
                         </label>
 
-                        <input
-                            id="issue-location"
-                            type="text"
-                            value={location}
-                            onChange={event =>
-                                setLocation(event.target.value)
-                            }
-                            placeholder="Block, floor, room or nearby landmark"
+                        <select
+                            id="issue-building"
+                            value={building}
+                            onChange={handleBuildingChange}
                             required
-                        />
+                        >
+                            <option value="">
+                                Choose a building
+                            </option>
+
+                            {buildings.map(item => (
+                                <option key={item} value={item}>
+                                    {item}
+                                </option>
+                            ))}
+                        </select>
+
+                        <label htmlFor="issue-floor">
+                            Select floor
+                        </label>
+
+                        <select
+                            id="issue-floor"
+                            value={floor}
+                            onChange={handleFloorChange}
+                            disabled={!building}
+                            required
+                        >
+                            <option value="">
+                                {building
+                                    ? "Choose a floor"
+                                    : "Select a building first"
+                                }
+                            </option>
+
+                            {floors.map(item => (
+                                <option key={item} value={item}>
+                                    Floor {item}
+                                </option>
+                            ))}
+                        </select>
+
+                        <label htmlFor="issue-classroom">
+                            Select classroom
+                        </label>
+
+                        <select
+                            id="issue-classroom"
+                            value={classroom}
+                            onChange={event =>
+                                setClassroom(event.target.value)
+                            }
+                            disabled={!floor}
+                            required
+                        >
+                            <option value="">
+                                {floor
+                                    ? "Choose a classroom"
+                                    : "Select a floor first"
+                                }
+                            </option>
+
+                            {classrooms.map(item => (
+                                <option key={item} value={item}>
+                                    {item}
+                                </option>
+                            ))}
+                        </select>
 
                         <label htmlFor="issue-image">
                             Photograph
