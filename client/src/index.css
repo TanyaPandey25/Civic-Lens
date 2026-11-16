@@ -2513,3 +2513,32 @@ hr {
         padding: 7px 8px;
     }
 }
+
+
+/* =====================================================
+   CIVICLENS — HOME HERO SPACING ADJUSTMENT
+   Reduced top spacing · Higher live counter
+===================================================== */
+
+.hero {
+    min-height: 0;
+    padding: 42px 7% 55px;
+    align-items: flex-start;
+}
+
+.hero-text {
+    margin-bottom: 22px;
+}
+
+.report-counter {
+    margin-top: 24px;
+}
+
+/* Preserve the existing mobile layout */
+
+@media (max-width: 650px) {
+    .hero {
+        min-height: 500px;
+        padding: 75px 23px;
+    }
+}

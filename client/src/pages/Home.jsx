@@ -1,16 +1,12 @@
 
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
-    ArrowRight,
     ArrowUpRight,
     MapPin,
     Image as ImageIcon,
     Check,
     ClipboardList,
-    ChartNoAxesColumn,
-    CircleCheck,
-    FileText
+    CircleCheck
 } from "lucide-react";
 
 const API = "http://localhost:5000/api";
@@ -152,24 +148,6 @@ function Home() {
                         CivicLens gives every campus concern
                         a place to be heard and tracked.
                     </p>
-
-                    <div className="hero-buttons">
-                        <Link
-                            to="/report"
-                            className="primary-button"
-                        >
-                            Report a problem
-                            <ArrowRight size={15} />
-                        </Link>
-
-                        <Link
-                            to="/issues"
-                            className="secondary-button"
-                        >
-                            Explore reports
-                            <ArrowUpRight size={15} />
-                        </Link>
-                    </div>
 
                     <div className="report-counter">
 
