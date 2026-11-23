@@ -10,6 +10,8 @@ import IssueDetails from "./pages/IssueDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+import PlumberPreview from "./components/companions/PlumberPreview";
+
 function App() {
     return (
         <BrowserRouter>
@@ -44,6 +46,11 @@ function App() {
                 <Route
                     path="/register"
                     element={<Register />}
+                />
+
+                <Route
+                    path="/plumber-preview"
+                    element={<PlumberPreview />}
                 />
             </Routes>
 

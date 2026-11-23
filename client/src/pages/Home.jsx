@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import {
     ArrowLeft,
     ArrowRight,
@@ -8,9 +8,11 @@ import {
     Layers3,
     Search,
     Wrench,
-    Activity,
     CircleCheck
 } from "lucide-react";
+
+import { Canvas } from "@react-three/fiber";
+import { Model } from "../components/companions/PlumberModel";
 
 const API = "https://civiclens-backend-oru7.onrender.com/api";
 
@@ -71,6 +73,56 @@ const JOURNEY_CARDS = [
         icon: CircleCheck
     }
 ];
+
+// 3D PLUMBER COMPANION
+
+function PlumberCompanion() {
+    return (
+        <div className="hero-companion">
+
+            <div className="companion-model">
+                <Canvas
+                    camera={{
+                        position: [0, 1.1, 4.5],
+                        fov: 35
+                    }}
+                    gl={{
+                        alpha: true,
+                        antialias: true
+                    }}
+                >
+                    <ambientLight intensity={1.5} />
+
+                    <directionalLight
+                        position={[3, 5, 4]}
+                        intensity={2}
+                    />
+
+                    <Suspense fallback={null}>
+                        <Model
+                            animation="idle"
+                            position={[0, -0.85, 0]}
+                            scale={1}
+                        />
+                    </Suspense>
+                </Canvas>
+            </div>
+
+            <div className="companion-thought">
+                <span className="thought-label">
+                    YOUR CAMPUS HELPER
+                </span>
+
+                <p>
+                    Got a campus issue?
+                    <br />
+                    Let's get it fixed!
+                </p>
+            </div>
+
+        </div>
+    );
+}
 
 function Home() {
     const [issues, setIssues] = useState([]);
@@ -236,6 +288,7 @@ function Home() {
             {/* HERO */}
 
             <section className="hero">
+
                 <div className="hero-content">
 
                     <p className="eyebrow">
@@ -283,7 +336,13 @@ function Home() {
                         </div>
 
                     </div>
+
                 </div>
+
+                {/* 3D PLUMBER */}
+
+                <PlumberCompanion />
+
             </section>
 
             {/* CAMPUS PULSE CAROUSEL */}
