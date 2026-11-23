@@ -1,3 +1,4 @@
+
 const dns = require("dns");
 dns.setServers(["8.8.8.8"]);
 
@@ -11,6 +12,13 @@ const path = require("path");
 const fs = require("fs");
 
 const Issue = require("./models/Issue");
+
+const {
+    authenticateToken,
+    requireAdmin
+} = require("./middleware/authMiddleware");
+
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -63,6 +71,9 @@ const upload = multer({
 
 app.use(cors());
 app.use(express.json());
+
+// Authentication routes
+app.use("/api/auth", authRoutes);
 
 // Serve uploaded images
 app.use("/uploads", express.static(uploadDir));
@@ -184,8 +195,10 @@ app.get("/api/health", (req, res) => {
 });
 
 // CREATE: Submit a new campus issue
+// Logged-in students and admins can submit reports
 app.post(
     "/api/reports",
+    authenticateToken,
     (req, res, next) => {
         upload.single("image")(req, res, (error) => {
             if (error) {
@@ -234,7 +247,10 @@ app.post(
                 location: location.trim(),
                 category: category || "General",
                 severity: "Low",
-                imageUrl
+                imageUrl,
+
+                // Save the ID of the logged-in user
+                createdBy: req.user.id
             });
 
             issueCreated = true;
@@ -263,6 +279,47 @@ app.post(
             return res.status(500).json({
                 success: false,
                 message: "Failed to save the report"
+            });
+        }
+    }
+);
+
+// READ: Get all reports submitted by the logged-in user
+app.get(
+    "/api/my-reports",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            // Find only reports belonging to this account
+            const myIssueIds = await Issue.find({
+                createdBy: req.user.id
+            }).distinct("_id");
+
+            // Get formatted issues with calculated severity
+            const allIssues =
+                await getIssuesWithCalculatedSeverity();
+
+            // Keep only this user's reports
+            const myIssueIdSet = new Set(
+                myIssueIds.map((id) => id.toString())
+            );
+
+            const myReports = allIssues.filter(
+                (issue) => myIssueIdSet.has(issue.id)
+            );
+
+            return res.json({
+                success: true,
+                count: myReports.length,
+                reports: myReports
+            });
+
+        } catch (error) {
+            console.error("Fetch my reports error:", error.message);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to fetch your reports"
             });
         }
     }
@@ -328,120 +385,130 @@ app.get("/api/issues/:id", async (req, res) => {
     }
 });
 
-// UPDATE: Modify an existing issue
-app.patch("/api/issues/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
+// UPDATE: Admin only
+app.patch(
+    "/api/issues/:id",
+    authenticateToken,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
 
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid issue ID"
-            });
-        }
-
-        const allowedFields = [
-            "title",
-            "description",
-            "location",
-            "category",
-            "status"
-        ];
-
-        const updates = {};
-
-        for (const field of allowedFields) {
-            if (req.body[field] !== undefined) {
-                updates[field] = req.body[field];
+            if (!mongoose.isValidObjectId(id)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid issue ID"
+                });
             }
-        }
 
-        if (Object.keys(updates).length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "No valid fields provided for update"
-            });
-        }
+            const allowedFields = [
+                "title",
+                "description",
+                "location",
+                "category",
+                "status"
+            ];
 
-        const updatedIssue = await Issue.findByIdAndUpdate(
-            id,
-            updates,
-            {
-                new: true,
-                runValidators: true
+            const updates = {};
+
+            for (const field of allowedFields) {
+                if (req.body[field] !== undefined) {
+                    updates[field] = req.body[field];
+                }
             }
-        );
 
-        if (!updatedIssue) {
-            return res.status(404).json({
+            if (Object.keys(updates).length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "No valid fields provided for update"
+                });
+            }
+
+            const updatedIssue = await Issue.findByIdAndUpdate(
+                id,
+                updates,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
+
+            if (!updatedIssue) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Issue not found"
+                });
+            }
+
+            // Recalculate after location or category changes too
+            const issues = await getIssuesWithCalculatedSeverity();
+
+            const issue = issues.find(
+                (item) => item.id === id
+            );
+
+            return res.json({
+                success: true,
+                message: "Issue updated successfully",
+                issue
+            });
+
+        } catch (error) {
+            console.error("Update issue error:", error.message);
+
+            return res.status(500).json({
                 success: false,
-                message: "Issue not found"
+                message: "Failed to update issue"
             });
         }
-
-        // Recalculate after location or category changes too
-        const issues = await getIssuesWithCalculatedSeverity();
-
-        const issue = issues.find(
-            (item) => item.id === id
-        );
-
-        return res.json({
-            success: true,
-            message: "Issue updated successfully",
-            issue
-        });
-
-    } catch (error) {
-        console.error("Update issue error:", error.message);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to update issue"
-        });
     }
-});
+);
 
-// DELETE: Remove an issue and its uploaded image
-app.delete("/api/issues/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
+// DELETE: Admin only
+app.delete(
+    "/api/issues/:id",
+    authenticateToken,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
 
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
+            if (!mongoose.isValidObjectId(id)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid issue ID"
+                });
+            }
+
+            const issue = await Issue.findByIdAndDelete(id);
+
+            if (!issue) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Issue not found"
+                });
+            }
+
+            removeUploadedFile(issue.imageUrl);
+
+            // Recalculate severity after deletion
+            await getIssuesWithCalculatedSeverity();
+
+            return res.json({
+                success: true,
+                message: "Issue deleted successfully"
+            });
+
+        } catch (error) {
+            console.error("Delete issue error:", error.message);
+
+            return res.status(500).json({
                 success: false,
-                message: "Invalid issue ID"
+                message: "Failed to delete issue"
             });
         }
-
-        const issue = await Issue.findByIdAndDelete(id);
-
-        if (!issue) {
-            return res.status(404).json({
-                success: false,
-                message: "Issue not found"
-            });
-        }
-
-        removeUploadedFile(issue.imageUrl);
-
-        // Recalculate severity after deletion
-        await getIssuesWithCalculatedSeverity();
-
-        return res.json({
-            success: true,
-            message: "Issue deleted successfully"
-        });
-
-    } catch (error) {
-        console.error("Delete issue error:", error.message);
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to delete issue"
-        });
     }
-});
+);
 
 // Handle unexpected server errors
 app.use((error, req, res, next) => {

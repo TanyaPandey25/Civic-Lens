@@ -1,9 +1,15 @@
 
 import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Sun, Moon, Layers3 } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Sun, Moon, Layers3, LogOut } from "lucide-react";
+
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
+    const navigate = useNavigate();
+
+    const { user, isAuthenticated, isAdmin, logout } = useAuth();
+
     const [theme, setTheme] = useState(
         () => localStorage.getItem("civiclens-theme") || "light"
     );
@@ -17,6 +23,11 @@ function Navbar() {
         setTheme(current =>
             current === "dark" ? "light" : "dark"
         );
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
     };
 
     return (
@@ -33,17 +44,41 @@ function Navbar() {
                     Home
                 </NavLink>
 
-                <NavLink to="/issues">
-                    Explore Issues
-                </NavLink>
+                {isAuthenticated && (
+                    <NavLink to="/issues">
+                        Explore Issues
+                    </NavLink>
+                )}
 
-                <NavLink to="/report">
-                    Report
-                </NavLink>
+                {isAuthenticated && !isAdmin && (
+                    <NavLink to="/report">
+                        Report
+                    </NavLink>
+                )}
 
-                <NavLink to="/login">
-                    Login
-                </NavLink>
+                {!isAuthenticated && (
+                    <>
+                        <NavLink to="/login">
+                            Login
+                        </NavLink>
+
+                        <NavLink to="/register">
+                            Register
+                        </NavLink>
+                    </>
+                )}
+
+                {isAuthenticated && (
+                    <button
+                        type="button"
+                        className="theme-toggle"
+                        onClick={handleLogout}
+                        title={`Logout ${user?.name || ""}`}
+                        aria-label="Logout"
+                    >
+                        <LogOut size={17} />
+                    </button>
+                )}
 
                 <button
                     type="button"

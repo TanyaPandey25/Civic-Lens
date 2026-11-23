@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const issueSchema = new mongoose.Schema(
@@ -7,29 +8,35 @@ const issueSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+
         description: {
             type: String,
             required: true,
             trim: true
         },
+
         location: {
             type: String,
             required: true,
             trim: true
         },
+
         imageUrl: {
             type: String,
             default: ""
         },
+
         category: {
             type: String,
             default: "General"
         },
+
         severity: {
             type: String,
             enum: ["Low", "Medium", "High"],
             default: "Low"
         },
+
         status: {
             type: String,
             enum: [
@@ -39,6 +46,13 @@ const issueSchema = new mongoose.Schema(
                 "Resolved"
             ],
             default: "Reported"
+        },
+
+        // Account that submitted this report
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         }
     },
     {
