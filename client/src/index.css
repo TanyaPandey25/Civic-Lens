@@ -3194,3 +3194,465 @@ hr {
         transform: none;
     }
 }
+
+
+
+/* =====================================================
+   CIVICLENS — CAMPUS JOURNEY CAROUSEL
+===================================================== */
+
+.campus-pulse {
+    overflow: hidden;
+    padding-bottom: 95px;
+}
+
+.pulse-heading {
+    margin-bottom: 42px;
+}
+
+/* Carousel heading and controls */
+
+.pulse-carousel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
+}
+
+.pulse-carousel-caption {
+    color: var(--text-subtle);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.pulse-carousel-controls {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.pulse-carousel-button {
+    width: 39px;
+    height: 39px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--text);
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+
+    transition:
+        color 250ms ease,
+        background 250ms ease,
+        border-color 250ms ease,
+        transform 250ms ease;
+}
+
+.pulse-carousel-button:hover {
+    color: var(--bg-raised);
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.pulse-carousel-button:active {
+    transform: scale(0.94);
+}
+
+/* Horizontal scrolling track */
+
+.pulse-carousel {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+
+    width: 100%;
+    padding: 13px 4px 30px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+
+.pulse-carousel::-webkit-scrollbar {
+    height: 5px;
+}
+
+.pulse-carousel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pulse-carousel::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 10px;
+}
+
+/* Individual cards */
+
+.journey-card {
+    position: relative;
+
+    flex: 0 0 clamp(270px, 27vw, 340px);
+    min-width: 0;
+
+    overflow: hidden;
+
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    scroll-snap-align: start;
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.035);
+
+    transition:
+        transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 300ms ease,
+        box-shadow 350ms ease;
+}
+
+/* Single controlled lift on hover */
+
+@media (hover: hover) and (pointer: fine) {
+    .journey-card:hover {
+        transform: translateY(-9px);
+
+        border-color: var(--jade);
+
+        box-shadow:
+            0 17px 35px rgba(0, 0, 0, 0.11),
+            0 4px 12px rgba(40, 106, 100, 0.07);
+    }
+}
+
+/* Card visual area */
+
+.journey-card-visual {
+    position: relative;
+    isolation: isolate;
+
+    height: 205px;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    overflow: hidden;
+
+    color: #E9EFE8;
+    background: #203A34;
+}
+
+.journey-card-visual::before {
+    position: absolute;
+    z-index: -1;
+    content: "";
+
+    width: 210px;
+    height: 210px;
+    right: -65px;
+    bottom: -115px;
+
+    border: 1px solid rgba(220, 231, 221, 0.23);
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 0 22px rgba(220, 231, 221, 0.035),
+        0 0 0 48px rgba(220, 231, 221, 0.025);
+}
+
+.journey-card-visual::after {
+    position: absolute;
+    z-index: -1;
+    content: "";
+
+    width: 145px;
+    height: 145px;
+    right: 4px;
+    top: 35px;
+
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle,
+        rgba(154, 185, 165, 0.17),
+        transparent 70%
+    );
+}
+
+.journey-visual-2 {
+    background: #284943;
+}
+
+.journey-visual-3 {
+    background: #354B43;
+}
+
+.journey-visual-4 {
+    background: #34463D;
+}
+
+.journey-visual-5 {
+    background: #24443D;
+}
+
+.journey-visual-6 {
+    background: #29483B;
+}
+
+.journey-visual-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #A9C4B2;
+}
+
+.journey-visual-top span {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.journey-visual-top svg {
+    color: #A9C4B2;
+    stroke-width: 1.5;
+}
+
+.journey-visual-main {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.journey-visual-value {
+    max-width: 100%;
+
+    color: #F0F0E6;
+    font-size: 55px;
+    font-weight: 500;
+    letter-spacing: -3px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+
+    overflow-wrap: anywhere;
+}
+
+.journey-visual-value.is-text {
+    max-width: 90%;
+
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    line-height: 1.35;
+}
+
+.journey-visual-label {
+    color: #A9C4B2;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.journey-visual-lines {
+    position: absolute;
+    right: 20px;
+    bottom: 24px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+
+    opacity: 0.45;
+}
+
+.journey-visual-lines span {
+    height: 2px;
+    width: 43px;
+    background: #A9C4B2;
+    border-radius: 5px;
+}
+
+.journey-visual-lines span:nth-child(2) {
+    width: 29px;
+}
+
+.journey-visual-lines span:nth-child(3) {
+    width: 17px;
+}
+
+.journey-visual-number {
+    position: absolute;
+    right: 18px;
+    top: 45px;
+
+    color: rgba(220, 231, 221, 0.07);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 105px;
+    line-height: 1;
+}
+
+/* Card content */
+
+.journey-card-content {
+    min-height: 166px;
+    padding: 21px 21px 23px;
+}
+
+.journey-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin-bottom: 14px;
+
+    color: var(--text-subtle);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.journey-card-meta span:last-child {
+    flex-shrink: 0;
+}
+
+.journey-card-content h3 {
+    margin-bottom: 8px;
+
+    color: var(--forest);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+
+    transition: color 250ms ease;
+}
+
+.journey-card-content p {
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.85;
+}
+
+:root[data-theme="dark"] .journey-card-content h3 {
+    color: #DDE9DE;
+}
+
+/* Subtle hover image-panel movement */
+
+.journey-card-visual {
+    transition: filter 350ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .journey-card:hover .journey-card-visual {
+        filter: brightness(1.08);
+    }
+
+    .journey-card:hover .journey-card-content h3 {
+        color: var(--teal);
+    }
+
+    :root[data-theme="dark"] .journey-card:hover .journey-card-content h3 {
+        color: var(--jade);
+    }
+}
+
+/* Carousel footer */
+
+.pulse-carousel-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    padding: 4px 3px 0;
+
+    color: var(--text-subtle);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+/* Responsive */
+
+@media (max-width: 700px) {
+    .campus-pulse {
+        padding: 70px 23px 80px;
+    }
+
+    .pulse-heading {
+        margin-bottom: 38px;
+    }
+
+    .pulse-carousel {
+        gap: 15px;
+        padding-bottom: 25px;
+    }
+
+    .journey-card {
+        flex-basis: 82%;
+    }
+
+    .journey-card-visual {
+        height: 185px;
+    }
+
+    .journey-card-content {
+        min-height: 155px;
+        padding: 18px;
+    }
+
+    .pulse-carousel-footer {
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 400px) {
+    .journey-card {
+        flex-basis: 88%;
+    }
+
+    .journey-card-visual {
+        height: 170px;
+    }
+
+    .pulse-carousel-button {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+    .pulse-carousel {
+        scroll-behavior: auto;
+    }
+
+    .journey-card,
+    .journey-card-visual,
+    .journey-card-content h3,
+    .pulse-carousel-button {
+        transition: none;
+    }
+
+    .journey-card:hover {
+        transform: none;
+    }
+}

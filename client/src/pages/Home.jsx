@@ -1,12 +1,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-    ArrowUpRight,
-    MapPin,
-    Check,
+    ArrowLeft,
+    ArrowRight,
     ClipboardList,
-    CircleCheck,
-    Activity
+    MapPin,
+    Layers3,
+    Search,
+    Wrench,
+    Activity,
+    CircleCheck
 } from "lucide-react";
 
 const API = "https://civiclens-backend-oru7.onrender.com/api";
@@ -18,34 +21,54 @@ const STATUSES = [
     "Resolved"
 ];
 
-const PROCESS_STAGES = [
+const JOURNEY_CARDS = [
     {
         number: "01",
         label: "THE FIRST SIGNAL",
         title: "Notice it. Report it.",
         description:
-            "Every improvement begins when someone speaks up. Share what happened and where."
+            "Every improvement begins when someone speaks up. Give campus concerns a place to be heard.",
+        icon: ClipboardList
     },
     {
         number: "02",
-        label: "SEE THE BIGGER PICTURE",
-        title: "Understand the pattern.",
+        label: "PINPOINT THE PROBLEM",
+        title: "Know where it happens.",
         description:
-            "Individual reports help reveal recurring concerns and areas that need attention."
+            "Identify the exact locations where campus issues need attention.",
+        icon: MapPin
     },
     {
         number: "03",
-        label: "MOVE TOWARDS CHANGE",
-        title: "Turn insight into action.",
+        label: "SEE THE BIGGER PICTURE",
+        title: "Understand the pattern.",
         description:
-            "Follow each concern as it moves through the campus resolution process."
+            "Explore reported concerns and recognize recurring campus problems.",
+        icon: Layers3
     },
     {
         number: "04",
+        label: "MOVE TOWARDS CHANGE",
+        title: "Prioritize what matters.",
+        description:
+            "Bring attention to reported concerns that need investigation and action.",
+        icon: Search
+    },
+    {
+        number: "05",
+        label: "FOLLOW THE RESPONSE",
+        title: "Track every update.",
+        description:
+            "Keep track of concerns as they move through the resolution process.",
+        icon: Wrench
+    },
+    {
+        number: "06",
         label: "A BETTER CAMPUS",
         title: "Make progress visible.",
         description:
-            "Every resolved issue is a step towards a safer, better-maintained campus."
+            "Every resolved issue is a step towards a safer, better-maintained campus.",
+        icon: CircleCheck
     }
 ];
 
@@ -55,6 +78,7 @@ function Home() {
     const [displayCount, setDisplayCount] = useState(0);
 
     const displayedCountRef = useRef(0);
+    const carouselRef = useRef(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -138,15 +162,73 @@ function Home() {
     const totalIssues = issues.length;
     const resolvedCount = statusCounts["Resolved"];
 
+    const uniqueLocations = new Set(
+        issues
+            .map(issue => issue.location)
+            .filter(Boolean)
+    ).size;
+
+    const uniqueCategories = new Set(
+        issues
+            .map(issue => issue.category)
+            .filter(Boolean)
+    ).size;
+
+    const activeCount =
+        statusCounts["Reported"] +
+        statusCounts["Under Investigation"];
+
     const latestIssue = [...issues].sort(
         (a, b) =>
             new Date(b.createdAt || 0) -
             new Date(a.createdAt || 0)
     )[0];
 
-    const currentStage = latestIssue
-        ? STATUSES.indexOf(latestIssue.status)
-        : -1;
+    const cardMetrics = [
+        {
+            value: totalIssues.toString().padStart(2, "0"),
+            label: "TOTAL REPORTS",
+            isText: false
+        },
+        {
+            value: uniqueLocations.toString().padStart(2, "0"),
+            label: "CAMPUS LOCATIONS",
+            isText: false
+        },
+        {
+            value: uniqueCategories.toString().padStart(2, "0"),
+            label: "ISSUE CATEGORIES",
+            isText: false
+        },
+        {
+            value: activeCount.toString().padStart(2, "0"),
+            label: "NEEDING ATTENTION",
+            isText: false
+        },
+        {
+            value: latestIssue
+                ? latestIssue.title
+                : "No reports yet",
+            label: latestIssue
+                ? latestIssue.status
+                : "AWAITING FIRST REPORT",
+            isText: true
+        },
+        {
+            value: resolvedCount.toString().padStart(2, "0"),
+            label: "ISSUES RESOLVED",
+            isText: false
+        }
+    ];
+
+    const scrollCarousel = (direction) => {
+        if (!carouselRef.current) return;
+
+        carouselRef.current.scrollBy({
+            left: direction * carouselRef.current.clientWidth * 0.75,
+            behavior: "smooth"
+        });
+    };
 
     return (
         <main>
@@ -204,7 +286,7 @@ function Home() {
                 </div>
             </section>
 
-            {/* CAMPUS PULSE */}
+            {/* CAMPUS PULSE CAROUSEL */}
 
             <section
                 className="campus-pulse"
@@ -230,164 +312,112 @@ function Home() {
 
                 </div>
 
-                <div className="pulse-layout">
+                <div className="pulse-carousel-header">
 
-                    {/* CONNECTED PROCESS */}
+                    <span className="pulse-carousel-caption">
+                        EXPLORE THE JOURNEY
+                    </span>
 
-                    <div className="pulse-timeline">
+                    <div className="pulse-carousel-controls">
 
-                        {PROCESS_STAGES.map((stage, index) => {
-                            const completed =
-                                currentStage > index;
+                        <button
+                            type="button"
+                            className="pulse-carousel-button"
+                            onClick={() => scrollCarousel(-1)}
+                            aria-label="Scroll cards left"
+                        >
+                            <ArrowLeft size={17} />
+                        </button>
 
-                            const active =
-                                currentStage === index;
-
-                            return (
-                                <article
-                                    className={`pulse-stage ${
-                                        completed ? "is-completed" : ""
-                                    }`}
-                                >
-
-                                    <div className="pulse-stage-marker">
-                                        <span className="pulse-stage-number">
-                                            {completed ? (
-                                                <Check size={15} />
-                                            ) : (
-                                                stage.number
-                                            )}
-                                        </span>
-                                    </div>
-
-                                    <div className="pulse-stage-content">
-
-                                        <div className="pulse-stage-meta">
-                                            <span>{stage.label}</span>
-
-                                            {active && (
-                                                <span className="pulse-current-label">
-                                                    LATEST ISSUE HERE
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <h3>{stage.title}</h3>
-
-                                        <p>{stage.description}</p>
-
-                                    </div>
-
-                                </article>
-                            );
-                        })}
+                        <button
+                            type="button"
+                            className="pulse-carousel-button"
+                            onClick={() => scrollCarousel(1)}
+                            aria-label="Scroll cards right"
+                        >
+                            <ArrowRight size={17} />
+                        </button>
 
                     </div>
 
-                    {/* LIVE CAMPUS SNAPSHOT */}
+                </div>
 
-                    <aside className="pulse-side">
+                <div
+                    className="pulse-carousel"
+                    ref={carouselRef}
+                    role="region"
+                    aria-label="CivicLens campus journey cards"
+                    tabIndex={0}
+                >
 
-                        <div className="pulse-live-card">
+                    {JOURNEY_CARDS.map((stage, index) => {
+                        const StageIcon = stage.icon;
+                        const metric = cardMetrics[index];
 
-                            <div className="pulse-card-header">
+                        return (
+                            <article
+                                className="journey-card"
+                                key={stage.number}
+                            >
 
-                                <div className="pulse-card-heading">
-                                    <Activity size={16} />
-                                    <span>LIVE CAMPUS SNAPSHOT</span>
-                                </div>
+                                <div className={`journey-card-visual journey-visual-${index + 1}`}>
 
-                                <span className="pulse-live-indicator">
-                                    <span className="live-dot"></span>
-                                    LIVE
-                                </span>
+                                    <div className="journey-visual-top">
+                                        <span>
+                                            CIVICLENS / {stage.number}
+                                        </span>
 
-                            </div>
-
-                            <div className="pulse-total">
-
-                                <span className="pulse-stat-label">
-                                    TOTAL REPORTED ISSUES
-                                </span>
-
-                                <div>
-                                    {totalIssues.toString().padStart(2, "0")}
-                                    <span> reports</span>
-                                </div>
-
-                            </div>
-
-                            <div className="pulse-stat-grid">
-
-                                <div className="pulse-stat">
-                                    <span className="pulse-stat-label">
-                                        RESOLVED
-                                    </span>
-
-                                    <strong>{resolvedCount}</strong>
-                                </div>
-
-                                <div className="pulse-stat">
-                                    <span className="pulse-stat-label">
-                                        IN PROGRESS
-                                    </span>
-
-                                    <strong>
-                                        {statusCounts["Under Investigation"] +
-                                            statusCounts["Action Taken"]}
-                                    </strong>
-                                </div>
-
-                            </div>
-
-                            <div className="pulse-latest">
-
-                                <div className="pulse-latest-heading">
-                                    <span>RECENT CAMPUS CONCERN</span>
-                                    <ArrowUpRight size={16} />
-                                </div>
-
-                                {latestIssue ? (
-                                    <>
-                                        <h3>{latestIssue.title}</h3>
-
-                                        <p className="pulse-latest-location">
-                                            <MapPin size={13} />
-                                            {latestIssue.location || "Campus location"}
-                                        </p>
-
-                                        <div className="pulse-latest-status">
-                                            <span className="pulse-status-dot"></span>
-                                            {latestIssue.status}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="pulse-empty">
-                                        <CircleCheck size={22} />
-
-                                        <p>
-                                            No reports yet. Your first
-                                            report can start the change.
-                                        </p>
+                                        <StageIcon size={20} />
                                     </div>
-                                )}
 
-                            </div>
+                                    <div className="journey-visual-main">
 
-                            <div className="pulse-card-footer">
-                                <span>COMMUNITY-DRIVEN CHANGE</span>
-                                <span>CIVICLENS</span>
-                            </div>
+                                        <span className={`journey-visual-value ${
+                                            metric.isText ? "is-text" : ""
+                                        }`}>
+                                            {metric.value}
+                                        </span>
 
-                        </div>
+                                        <span className="journey-visual-label">
+                                            {metric.label}
+                                        </span>
 
-                        <p className="pulse-side-note">
-                            Every voice matters.
-                            <span> Every report counts.</span>
-                        </p>
+                                    </div>
 
-                    </aside>
+                                    <div className="journey-visual-lines">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
 
+                                    <span className="journey-visual-number">
+                                        {stage.number}
+                                    </span>
+
+                                </div>
+
+                                <div className="journey-card-content">
+
+                                    <div className="journey-card-meta">
+                                        <span>{stage.label}</span>
+                                        <span>{stage.number} / 06</span>
+                                    </div>
+
+                                    <h3>{stage.title}</h3>
+
+                                    <p>{stage.description}</p>
+
+                                </div>
+
+                            </article>
+                        );
+                    })}
+
+                </div>
+
+                <div className="pulse-carousel-footer">
+                    <span>01 — 06</span>
+                    <span>SCROLL OR USE THE ARROWS TO EXPLORE</span>
                 </div>
 
             </section>
