@@ -131,7 +131,10 @@ function Home() {
 
     const displayedCountRef = useRef(0);
     const carouselRef = useRef(null);
+    const isCarouselHovered = useRef(false);
+    const manualPauseUntil = useRef(0);
 
+    // Fetch live report data
     useEffect(() => {
         let isMounted = true;
 
@@ -153,6 +156,7 @@ function Home() {
                     setIssues(reports);
                     setCount(reports.length);
                 }
+
             } catch (error) {
                 console.error("Report count error:", error);
             }
@@ -168,6 +172,7 @@ function Home() {
         };
     }, []);
 
+    // Animate the live report counter
     useEffect(() => {
         if (count === null) return;
 
@@ -203,6 +208,103 @@ function Home() {
         return () => cancelAnimationFrame(animationFrame);
     }, [count]);
 
+    // Automatically move the carousel continuously
+    useEffect(() => {
+        const carousel = carouselRef.current;
+
+        if (!carousel) return;
+
+        let animationFrame;
+        let previousTime = 0;
+
+        const moveCarousel = (currentTime) => {
+            if (!previousTime) {
+                previousTime = currentTime;
+            }
+
+            const delta = Math.min(
+                currentTime - previousTime,
+                40
+            );
+
+            previousTime = currentTime;
+
+            const isManuallyPaused =
+                currentTime < manualPauseUntil.current;
+
+            if (
+                !isCarouselHovered.current &&
+                !isManuallyPaused
+            ) {
+                // Automatic movement speed: 25 pixels per second
+                carousel.scrollLeft += delta * 0.025;
+            }
+
+            // Reset at the halfway point for a seamless loop
+            const loopWidth = carousel.scrollWidth / 2;
+
+            if (loopWidth > 0) {
+                if (carousel.scrollLeft >= loopWidth) {
+                    carousel.scrollLeft -= loopWidth;
+                }
+
+                if (carousel.scrollLeft < 0) {
+                    carousel.scrollLeft += loopWidth;
+                }
+            }
+
+            animationFrame = requestAnimationFrame(moveCarousel);
+        };
+
+        animationFrame = requestAnimationFrame(moveCarousel);
+
+        return () => {
+            cancelAnimationFrame(animationFrame);
+        };
+    }, []);
+
+    // Manually move the carousel by one card
+    const scrollCarousel = (direction) => {
+        const carousel = carouselRef.current;
+
+        if (!carousel) return;
+
+        const card = carousel.querySelector(".journey-card");
+
+        if (!card) return;
+
+        const gap = window.innerWidth <= 700 ? 15 : 20;
+        const cardWidth = card.offsetWidth + gap;
+        const loopWidth = carousel.scrollWidth / 2;
+
+        if (loopWidth <= 0) return;
+
+        // Pause automatic movement briefly during manual navigation
+        manualPauseUntil.current = performance.now() + 450;
+
+        // Wrap to the duplicate set when moving backwards
+        // from the beginning
+        if (
+            direction < 0 &&
+            carousel.scrollLeft <= 1
+        ) {
+            carousel.scrollLeft = loopWidth;
+        }
+
+        // Move by exactly one card
+        carousel.scrollLeft += direction * cardWidth;
+
+        // Keep the scroll position inside the seamless loop
+        if (carousel.scrollLeft >= loopWidth) {
+            carousel.scrollLeft -= loopWidth;
+        }
+
+        if (carousel.scrollLeft < 0) {
+            carousel.scrollLeft += loopWidth;
+        }
+    };
+
+    // Calculate issue statistics
     const statusCounts = STATUSES.reduce((result, status) => {
         result[status] = issues.filter(
             issue => issue.status === status
@@ -230,12 +332,11 @@ function Home() {
         statusCounts["Reported"] +
         statusCounts["Under Investigation"];
 
-    const latestIssue = [...issues].sort(
-        (a, b) =>
-            new Date(b.createdAt || 0) -
-            new Date(a.createdAt || 0)
-    )[0];
+    const inProgressCount =
+        statusCounts["Under Investigation"] +
+        statusCounts["Action Taken"];
 
+    // Statistics displayed on the six journey cards
     const cardMetrics = [
         {
             value: totalIssues.toString().padStart(2, "0"),
@@ -258,13 +359,9 @@ function Home() {
             isText: false
         },
         {
-            value: latestIssue
-                ? latestIssue.title
-                : "No reports yet",
-            label: latestIssue
-                ? latestIssue.status
-                : "AWAITING FIRST REPORT",
-            isText: true
+            value: inProgressCount.toString().padStart(2, "0"),
+            label: "IN PROGRESS",
+            isText: false
         },
         {
             value: resolvedCount.toString().padStart(2, "0"),
@@ -273,14 +370,76 @@ function Home() {
         }
     ];
 
-    const scrollCarousel = (direction) => {
-        if (!carouselRef.current) return;
+    // Render one complete set of journey cards
+    const renderJourneyCards = (isDuplicate = false) => (
+        <div
+            className="pulse-marquee-group"
+            aria-hidden={isDuplicate ? "true" : undefined}
+        >
+            {JOURNEY_CARDS.map((stage, index) => {
+                const StageIcon = stage.icon;
+                const metric = cardMetrics[index];
 
-        carouselRef.current.scrollBy({
-            left: direction * carouselRef.current.clientWidth * 0.75,
-            behavior: "smooth"
-        });
-    };
+                return (
+                    <article
+                        className="journey-card"
+                        key={`${isDuplicate ? "duplicate-" : ""}${stage.number}`}
+                    >
+
+                        <div className={`journey-card-visual journey-visual-${index + 1}`}>
+
+                            <div className="journey-visual-top">
+                                <span>
+                                    CIVICLENS / {stage.number}
+                                </span>
+
+                                <StageIcon size={20} />
+                            </div>
+
+                            <div className="journey-visual-main">
+
+                                <span className={`journey-visual-value ${
+                                    metric.isText ? "is-text" : ""
+                                }`}>
+                                    {metric.value}
+                                </span>
+
+                                <span className="journey-visual-label">
+                                    {metric.label}
+                                </span>
+
+                            </div>
+
+                            <div className="journey-visual-lines">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+
+                            <span className="journey-visual-number">
+                                {stage.number}
+                            </span>
+
+                        </div>
+
+                        <div className="journey-card-content">
+
+                            <div className="journey-card-meta">
+                                <span>{stage.label}</span>
+                                <span>{stage.number} / 06</span>
+                            </div>
+
+                            <h3>{stage.title}</h3>
+
+                            <p>{stage.description}</p>
+
+                        </div>
+
+                    </article>
+                );
+            })}
+        </div>
+    );
 
     return (
         <main>
@@ -312,7 +471,11 @@ function Home() {
                     <div className="report-counter">
 
                         <div className="counter-icon">
-                            <ClipboardList size={22} color="#9AB9A5" />
+                            <ClipboardList
+                                size={27}
+                                color="#9AB9A5"
+                                strokeWidth={1.8}
+                            />
                         </div>
 
                         <div className="counter-content">
@@ -377,106 +540,51 @@ function Home() {
                         EXPLORE THE JOURNEY
                     </span>
 
-                    <div className="pulse-carousel-controls">
+                </div>
 
-                        <button
-                            type="button"
-                            className="pulse-carousel-button"
-                            onClick={() => scrollCarousel(-1)}
-                            aria-label="Scroll cards left"
-                        >
-                            <ArrowLeft size={17} />
-                        </button>
+                <div className="pulse-carousel-shell">
 
-                        <button
-                            type="button"
-                            className="pulse-carousel-button"
-                            onClick={() => scrollCarousel(1)}
-                            aria-label="Scroll cards right"
-                        >
-                            <ArrowRight size={17} />
-                        </button>
+                    <button
+                        type="button"
+                        className="pulse-arrow pulse-arrow-left"
+                        onClick={() => scrollCarousel(-1)}
+                        aria-label="Previous cards"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+
+                    <div
+                        className="pulse-carousel"
+                        ref={carouselRef}
+                        role="region"
+                        aria-label="CivicLens campus journey cards"
+                        onMouseEnter={() => {
+                            isCarouselHovered.current = true;
+                        }}
+                        onMouseLeave={() => {
+                            isCarouselHovered.current = false;
+                        }}
+                    >
+
+                        <div className="pulse-marquee-track">
+
+                            {renderJourneyCards()}
+
+                            {renderJourneyCards(true)}
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <button
+                        type="button"
+                        className="pulse-arrow pulse-arrow-right"
+                        onClick={() => scrollCarousel(1)}
+                        aria-label="Next cards"
+                    >
+                        <ArrowRight size={20} />
+                    </button>
 
-                <div
-                    className="pulse-carousel"
-                    ref={carouselRef}
-                    role="region"
-                    aria-label="CivicLens campus journey cards"
-                    tabIndex={0}
-                >
-
-                    {JOURNEY_CARDS.map((stage, index) => {
-                        const StageIcon = stage.icon;
-                        const metric = cardMetrics[index];
-
-                        return (
-                            <article
-                                className="journey-card"
-                                key={stage.number}
-                            >
-
-                                <div className={`journey-card-visual journey-visual-${index + 1}`}>
-
-                                    <div className="journey-visual-top">
-                                        <span>
-                                            CIVICLENS / {stage.number}
-                                        </span>
-
-                                        <StageIcon size={20} />
-                                    </div>
-
-                                    <div className="journey-visual-main">
-
-                                        <span className={`journey-visual-value ${
-                                            metric.isText ? "is-text" : ""
-                                        }`}>
-                                            {metric.value}
-                                        </span>
-
-                                        <span className="journey-visual-label">
-                                            {metric.label}
-                                        </span>
-
-                                    </div>
-
-                                    <div className="journey-visual-lines">
-                                        <span></span>
-                                        <span></span>
-                                        <span></span>
-                                    </div>
-
-                                    <span className="journey-visual-number">
-                                        {stage.number}
-                                    </span>
-
-                                </div>
-
-                                <div className="journey-card-content">
-
-                                    <div className="journey-card-meta">
-                                        <span>{stage.label}</span>
-                                        <span>{stage.number} / 06</span>
-                                    </div>
-
-                                    <h3>{stage.title}</h3>
-
-                                    <p>{stage.description}</p>
-
-                                </div>
-
-                            </article>
-                        );
-                    })}
-
-                </div>
-
-                <div className="pulse-carousel-footer">
-                    <span>01 — 06</span>
-                    <span>SCROLL OR USE THE ARROWS TO EXPLORE</span>
                 </div>
 
             </section>
