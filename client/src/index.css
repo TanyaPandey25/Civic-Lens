@@ -2529,6 +2529,7 @@ hr {
   letter-spacing: 2px;
 }
 
+
 .auth-content {
   width: 100%;
   max-width: 430px;
@@ -2536,11 +2537,12 @@ hr {
   padding: 34px;
 
   background: var(--bg-raised);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-strong);
   border-top: 2px solid var(--jade);
   border-radius: 7px;
   box-shadow: var(--shadow-soft);
 }
+
 
 .auth-heading {
   margin-bottom: 27px;

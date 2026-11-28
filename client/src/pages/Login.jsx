@@ -128,7 +128,7 @@ function Login() {
 
                 <p className="auth-switch">
                     New to CivicLens?
-                    <Link to="/register"> Create an account</Link>
+                    <Link to="/register"> Sign Up</Link>
                 </p>
             </section>
         </main>
