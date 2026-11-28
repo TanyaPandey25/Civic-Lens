@@ -121,24 +121,14 @@ img, svg {
   position: sticky;
   top: 0;
   z-index: 100;
-
   min-height: 76px;
   padding: 0 7%;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 25px;
 
-  background: color-mix(
-    in srgb,
-    var(--bg-raised) 78%,
-    transparent
-  );
-
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-
+  background: var(--bg-raised);
   border-bottom: 1px solid var(--border);
 }
 
@@ -1799,7 +1789,7 @@ hr {
 }
 
 :root[data-theme="dark"] .navbar {
-  background: rgba(25, 45, 40, 0.82);
+  background: #192D28;
 }
 
 :root[data-theme="dark"] .footer {
