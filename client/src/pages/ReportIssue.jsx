@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import {
     Upload,
     Image as ImageIcon,
@@ -8,6 +9,8 @@ import {
     ArrowRight,
     CheckCircle2
 } from "lucide-react";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const buildings = [
     "PJ Block",
@@ -22,8 +25,9 @@ const floors = Array.from({ length: 7 }, (_, index) =>
 );
 
 function ReportIssue() {
-    const [description, setDescription] = useState("");
+    const { token } = useAuth();
 
+    const [description, setDescription] = useState("");
     const [building, setBuilding] = useState("");
     const [floor, setFloor] = useState("");
     const [classroom, setClassroom] = useState("");
@@ -107,6 +111,12 @@ function ReportIssue() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        if (!token) {
+            setMessageType("error");
+            setMessage("Your session has expired. Please log in again.");
+            return;
+        }
+
         try {
             setSubmitting(true);
             setMessage("");
@@ -124,8 +134,13 @@ function ReportIssue() {
             }
 
             const response = await axios.post(
-                "https://civiclens-backend-oru7.onrender.com/api/reports",
-                formData
+                `${API}/reports`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
             );
 
             setMessage(
@@ -187,8 +202,6 @@ function ReportIssue() {
                             department handles the problem.
                         </span>
                     </div>
-
-                    
 
                 </aside>
 

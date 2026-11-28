@@ -13,7 +13,8 @@ import {
 import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../context/AuthContext";
 
-const API = "https://civiclens-backend-oru7.onrender.com/api";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SERVER_URL = API.replace(/\/api\/?$/, "");
 
 function IssueDetails() {
     const { id } = useParams();
@@ -52,6 +53,12 @@ function IssueDetails() {
 
     const updateStatus = async (event) => {
         const status = event.target.value;
+
+        if (!token) {
+            setMessageType("error");
+            setMessage("Your session has expired. Please log in again.");
+            return;
+        }
 
         try {
             setUpdating(true);
@@ -122,7 +129,6 @@ function IssueDetails() {
     if (!issue) {
         return (
             <main className="details-page">
-
                 <div className="directory-empty">
                     <h2>Issue not found.</h2>
 
@@ -139,14 +145,12 @@ function IssueDetails() {
                         Back to issues
                     </button>
                 </div>
-
             </main>
         );
     }
 
     return (
         <main className="details-page">
-
             <div className="details-container">
 
                 <button
@@ -158,7 +162,6 @@ function IssueDetails() {
                 </button>
 
                 <div className="details-intro">
-
                     <p className="eyebrow">
                         CAMPUS ISSUE RECORD
                     </p>
@@ -177,11 +180,9 @@ function IssueDetails() {
                         <MapPin size={15} />
                         {issue.location}
                     </p>
-
                 </div>
 
                 <div className="details-grid">
-
                     <div>
                         <span>Category</span>
                         <strong>{issue.category}</strong>
@@ -206,11 +207,9 @@ function IssueDetails() {
                                 : "N/A"}
                         </strong>
                     </div>
-
                 </div>
 
                 <section className="issue-description">
-
                     <p className="eyebrow">
                         THE REPORT
                     </p>
@@ -218,29 +217,25 @@ function IssueDetails() {
                     <h2>What happened?</h2>
 
                     <p>{issue.description}</p>
-
                 </section>
 
                 {issue.imageUrl && (
                     <section className="issue-image-section">
-
                         <h2>
                             <ImageIcon size={17} />
                             Attached photograph
                         </h2>
 
                         <img
-                            src={`https://civiclens-backend-oru7.onrender.com${issue.imageUrl}`}
+                            src={`${SERVER_URL}${issue.imageUrl}`}
                             alt="Photograph of the reported campus issue"
                             className="issue-detail-image"
                         />
-
                     </section>
                 )}
 
                 {isAdmin && (
                     <section className="status-update-section">
-
                         <div>
                             <p className="eyebrow">
                                 MANAGEMENT
@@ -286,7 +281,6 @@ function IssueDetails() {
                                 Updating status...
                             </p>
                         )}
-
                     </section>
                 )}
 
@@ -305,7 +299,6 @@ function IssueDetails() {
 
                 {isAdmin && (
                     <div className="issue-actions">
-
                         <button
                             className="secondary-button"
                             onClick={() => navigate("/issues")}
@@ -321,7 +314,6 @@ function IssueDetails() {
                             <Trash2 size={14} />
                             Delete issue
                         </button>
-
                     </div>
                 )}
 

@@ -99,6 +99,133 @@ const normalizeValue = (value) => {
         .replace(/\s+/g, " ");
 };
 
+// Automatically categorise an issue based on its description
+const categorizeIssue = (description) => {
+    const text = ` ${String(description || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()} `;
+
+    const matches = (keywords) => {
+        return keywords.some(keyword => {
+            const normalizedKeyword = keyword
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, " ")
+                .trim();
+
+            return text.includes(` ${normalizedKeyword} `);
+        });
+    };
+
+    // Electrical issues
+    if (matches([
+        "wiring",
+        "electrical",
+        "electricity",
+        "electric shock",
+        "short circuit",
+        "power supply",
+        "power cut",
+        "switch",
+        "socket",
+        "plug",
+        "fuse"
+    ])) {
+        return "Electrical";
+    }
+
+    // IT and equipment issues
+    if (matches([
+        "projector",
+        "computer",
+        "laptop",
+        "wifi",
+        "wi fi",
+        "network",
+        "printer",
+        "monitor",
+        "keyboard",
+        "mouse",
+        "smart board",
+        "internet"
+    ])) {
+        return "IT & Equipment";
+    }
+
+    // Furniture issues
+    if (matches([
+        "desk",
+        "chair",
+        "bench",
+        "table",
+        "cupboard",
+        "furniture",
+        "broken seat",
+        "damaged seat"
+    ])) {
+        return "Furniture";
+    }
+
+    // Water-related issues
+    if (matches([
+        "water",
+        "water leakage",
+        "leakage",
+        "leaking",
+        "leak",
+        "tap",
+        "faucet",
+        "drinking water",
+        "water supply",
+        "water shortage",
+        "pipe burst",
+        "pipeline"
+    ])) {
+        return "Water";
+    }
+
+    // Sanitation issues
+    if (matches([
+        "garbage",
+        "waste",
+        "dustbin",
+        "trash",
+        "litter",
+        "sanitation",
+        "cleanliness",
+        "unclean",
+        "dirty",
+        "sewage",
+        "overflowing bin"
+    ])) {
+        return "Sanitation";
+    }
+
+    // Infrastructure issues
+    if (matches([
+        "building",
+        "wall",
+        "ceiling",
+        "roof",
+        "door",
+        "window",
+        "staircase",
+        "stairs",
+        "corridor",
+        "floor tiles",
+        "crack",
+        "plaster",
+        "painting",
+        "pavement",
+        "infrastructure"
+    ])) {
+        return "Infrastructure";
+    }
+
+    // Default category when no keywords match
+    return "Other";
+};
+
 // Calculate severity based on report count
 const calculateSeverity = (count) => {
     if (count >= 6) {
@@ -217,8 +344,7 @@ app.post(
         try {
             const {
                 description,
-                location,
-                category
+                location
             } = req.body;
 
             if (
@@ -237,15 +363,20 @@ app.post(
                 });
             }
 
+            const cleanedDescription = description.trim();
+
             const imageUrl = req.file
                 ? `/uploads/${req.file.filename}`
                 : "";
 
+            // Automatically determine category from description
+            const category = categorizeIssue(cleanedDescription);
+
             const issue = await Issue.create({
-                title: description.trim().slice(0, 60),
-                description: description.trim(),
+                title: cleanedDescription.slice(0, 60),
+                description: cleanedDescription,
                 location: location.trim(),
-                category: category || "General",
+                category,
                 severity: "Low",
                 imageUrl,
 
