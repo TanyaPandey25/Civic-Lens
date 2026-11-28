@@ -1,17 +1,74 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight, UserRoundPlus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+    ArrowRight,
+    UserRoundPlus,
+    Eye,
+    EyeOff
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function Register() {
+    const navigate = useNavigate();
+    const { login } = useAuth();
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState("");
+    const [submitting, setSubmitting] = useState(false);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        setMessage("");
 
-        setMessage(
-            "Account creation is not connected to the authentication backend yet."
-        );
+        const collegeEmailRegex = /^[^\s@]+@bmsce\.ac\.in$/i;
+
+        if (!collegeEmailRegex.test(email.trim())) {
+            setMessage("Please use your BMSCE email address.");
+            return;
+        }
+
+        if (password.length < 8) {
+            setMessage("Password must contain at least 8 characters.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setMessage("Passwords do not match.");
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+
+            const response = await axios.post(`${API}/auth/register`, {
+                name,
+                email,
+                password
+            });
+
+            const { user, token } = response.data;
+
+            login(user, token);
+
+            navigate("/", { replace: true });
+
+        } catch (error) {
+            setMessage(
+                error.response?.data?.message ||
+                "Registration failed. Please try again."
+            );
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -70,18 +127,22 @@ function Register() {
                         type="text"
                         placeholder="Your name"
                         autoComplete="name"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
                         required
                     />
 
                     <label htmlFor="register-email">
-                        Email address
+                        BMSCE email address
                     </label>
 
                     <input
                         id="register-email"
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="you@bmsce.ac.in"
                         autoComplete="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                         required
                     />
 
@@ -89,27 +150,66 @@ function Register() {
                         Password
                     </label>
 
-                    <input
-                        id="register-password"
-                        type="password"
-                        placeholder="Create a password"
-                        autoComplete="new-password"
-                        minLength={8}
-                        required
-                    />
+                    <div className="password-field">
+                        <input
+                            id="register-password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Create a password"
+                            autoComplete="new-password"
+                            minLength={8}
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
+                        />
+
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+
+                    <label htmlFor="register-confirm-password">
+                        Confirm password
+                    </label>
+
+                    <div className="password-field">
+                        <input
+                            id="register-confirm-password"
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Re-enter your password"
+                            autoComplete="new-password"
+                            value={confirmPassword}
+                            onChange={(event) => setConfirmPassword(event.target.value)}
+                            required
+                        />
+
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
 
                     <button
                         type="submit"
                         className="primary-button full-width"
+                        disabled={submitting}
                     >
-                        Create account
-                        <ArrowRight size={15} />
+                        {submitting ? "Creating account..." : "Create account"}
+                        {!submitting && <ArrowRight size={15} />}
                     </button>
 
                 </form>
 
                 {message && (
-                    <p className="error-message" role="status">
+                    <p className="error-message" role="alert">
                         {message}
                     </p>
                 )}

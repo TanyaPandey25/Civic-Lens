@@ -2490,6 +2490,7 @@ hr {
 
 .auth-aside {
   max-width: 490px;
+  transform: translateY(-90px);
 }
 
 .auth-aside h1 {
@@ -2592,6 +2593,38 @@ hr {
 
 .auth-switch a:hover {
   text-decoration: underline;
+}
+
+/* Password visibility toggle */
+
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+
+  display: grid;
+  place-items: center;
+
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--teal);
 }
 
 /* =====================================================
