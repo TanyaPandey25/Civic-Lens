@@ -188,10 +188,7 @@ function ReportIssue() {
                         </span>
                     </div>
 
-                    <div className="report-aside-number">
-                        <span>01</span>
-                        <span>DESCRIBE · LOCATE · SUBMIT</span>
-                    </div>
+                    
 
                 </aside>
 

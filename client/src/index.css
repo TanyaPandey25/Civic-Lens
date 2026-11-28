@@ -2425,7 +2425,7 @@ hr {
 .report-form-section {
   padding: 32px;
   background: var(--bg-raised);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-strong);
   border-top: 2px solid var(--jade);
   border-radius: 7px;
 }

@@ -5,19 +5,20 @@ import axios from "axios";
 import {
     ArrowLeft,
     MapPin,
-    CalendarDays,
     Trash2,
     RefreshCw,
     Image as ImageIcon
 } from "lucide-react";
 
 import StatusBadge from "../components/StatusBadge";
+import { useAuth } from "../context/AuthContext";
 
 const API = "https://civiclens-backend-oru7.onrender.com/api";
 
 function IssueDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { isAdmin, token } = useAuth();
 
     const [issue, setIssue] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +59,12 @@ function IssueDetails() {
 
             const response = await axios.patch(
                 `${API}/issues/${id}`,
-                { status }
+                { status },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
             );
 
             setIssue(response.data.issue);
@@ -85,7 +91,12 @@ function IssueDetails() {
         if (!confirmed) return;
 
         try {
-            await axios.delete(`${API}/issues/${id}`);
+            await axios.delete(`${API}/issues/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
             navigate("/issues");
 
         } catch (err) {
@@ -227,55 +238,57 @@ function IssueDetails() {
                     </section>
                 )}
 
-                <section className="status-update-section">
+                {isAdmin && (
+                    <section className="status-update-section">
 
-                    <div>
-                        <p className="eyebrow">
-                            MANAGEMENT
-                        </p>
+                        <div>
+                            <p className="eyebrow">
+                                MANAGEMENT
+                            </p>
 
-                        <h2>Update issue status</h2>
+                            <h2>Update issue status</h2>
 
-                        <p>
-                            Record the latest progress
-                            on this campus concern.
-                        </p>
-                    </div>
+                            <p>
+                                Record the latest progress
+                                on this campus concern.
+                            </p>
+                        </div>
 
-                    <label htmlFor="issue-status">
-                        Current status
-                    </label>
+                        <label htmlFor="issue-status">
+                            Current status
+                        </label>
 
-                    <select
-                        id="issue-status"
-                        value={issue.status}
-                        onChange={updateStatus}
-                        disabled={updating}
-                    >
-                        <option value="Reported">
-                            Reported
-                        </option>
+                        <select
+                            id="issue-status"
+                            value={issue.status}
+                            onChange={updateStatus}
+                            disabled={updating}
+                        >
+                            <option value="Reported">
+                                Reported
+                            </option>
 
-                        <option value="Under Investigation">
-                            Under Investigation
-                        </option>
+                            <option value="Under Investigation">
+                                Under Investigation
+                            </option>
 
-                        <option value="Action Taken">
-                            Action Taken
-                        </option>
+                            <option value="Action Taken">
+                                Action Taken
+                            </option>
 
-                        <option value="Resolved">
-                            Resolved
-                        </option>
-                    </select>
+                            <option value="Resolved">
+                                Resolved
+                            </option>
+                        </select>
 
-                    {updating && (
-                        <p className="form-hint">
-                            Updating status...
-                        </p>
-                    )}
+                        {updating && (
+                            <p className="form-hint">
+                                Updating status...
+                            </p>
+                        )}
 
-                </section>
+                    </section>
+                )}
 
                 {message && (
                     <p
@@ -290,25 +303,27 @@ function IssueDetails() {
                     </p>
                 )}
 
-                <div className="issue-actions">
+                {isAdmin && (
+                    <div className="issue-actions">
 
-                    <button
-                        className="secondary-button"
-                        onClick={() => navigate("/issues")}
-                    >
-                        <ArrowLeft size={14} />
-                        Back to issues
-                    </button>
+                        <button
+                            className="secondary-button"
+                            onClick={() => navigate("/issues")}
+                        >
+                            <ArrowLeft size={14} />
+                            Back to issues
+                        </button>
 
-                    <button
-                        className="delete-button"
-                        onClick={deleteIssue}
-                    >
-                        <Trash2 size={14} />
-                        Delete issue
-                    </button>
+                        <button
+                            className="delete-button"
+                            onClick={deleteIssue}
+                        >
+                            <Trash2 size={14} />
+                            Delete issue
+                        </button>
 
-                </div>
+                    </div>
+                )}
 
             </div>
         </main>
